@@ -24,9 +24,9 @@ P1:
     KA:
       H:
         annotation_errors: medium
-      T:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: very_high
+      T:
         feature_leakage: medium
         incorrect_spatial_geometric_interpretation: very_high
 
@@ -72,9 +72,9 @@ P2:
     KA:
       H:
         annotation_errors: low
-      T:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: medium
+      T:
         feature_leakage: low
         incorrect_spatial_geometric_interpretation: medium
 
@@ -120,9 +120,9 @@ P3:
     KA:
       H:
         annotation_errors: medium
-      T:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: medium
+      T:
         feature_leakage: medium
         incorrect_spatial_geometric_interpretation: medium
 
@@ -168,9 +168,9 @@ P4:
     KA:
       H:
         annotation_errors: medium
-      T:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: very_high
+      T:
         feature_leakage: low
         incorrect_spatial_geometric_interpretation: high
 
