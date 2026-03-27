@@ -8,13 +8,14 @@ from pathlib import Path
 from typing import Dict, List, Mapping, Sequence
 
 from montecarlo.analysis import summarize_results
-from montecarlo.biases import DEFAULT_PROFILE_BIASES, ProfileBiasConfig, get_profile_bias_config
+from montecarlo.biases import ProfileBiasConfig
 from montecarlo.generator import GeneratedSample, VariabilityConfig, generate_samples_for_profile
 from montecarlo.profiles import (
-    DEFAULT_STAGE_ALIASES,
-    ProfileDefinition,
-    RelationStrength,
+    ConfigDefinition,
+    build_hierarchy_index,
+    load_config,
     load_profiles,
+    ProfileDefinition,
 )
 from montecarlo.runner import CRFilterConfig, run_generated_samples
 
@@ -24,6 +25,7 @@ LOGGER = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class MonteCarloConfig:
     base_yaml: str
+    config_yaml: str
     profiles_yaml: str
     samples_per_profile: int
     out_dir: str
@@ -34,8 +36,6 @@ class MonteCarloConfig:
     cr_mode: str = "any"
     dry_run: bool = False
     stop_on_error: bool = False
-    stage_step: int = 2
-    stage_strong_step: int = 4
 
 
 def _ensure_profile_subset(
@@ -62,29 +62,6 @@ def _load_base_hierarchy(path: str | Path) -> Dict:
     if not isinstance(payload, dict):
         raise ValueError("Base hierarchy YAML must contain a top-level mapping")
     return payload
-
-
-def _write_settings(out_dir: Path, cfg: MonteCarloConfig, profiles: Mapping[str, ProfileDefinition]) -> None:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "config": asdict(cfg),
-        "profiles": {
-            profile_id: {
-                "name": profile.name,
-                "expression": profile.expression,
-                "stage_scores": profile.stage_scores,
-            }
-            for profile_id, profile in profiles.items()
-        },
-        "stage_aliases": DEFAULT_STAGE_ALIASES,
-        "relation_mapping": {
-            "=": 0,
-            ">": cfg.stage_step,
-            ">>": cfg.stage_strong_step,
-        },
-    }
-    with (out_dir / "settings.json").open("w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
 def _write_all_runs(out_dir: Path, results: List[Dict]) -> None:
@@ -116,13 +93,49 @@ def _write_all_runs(out_dir: Path, results: List[Dict]) -> None:
             writer.writerow(["profile_id", "sample_index", "sample_seed", "accepted", "max_cr", "error", "offending_paths"])
 
 
+def _settings_payload(
+    cfg: MonteCarloConfig,
+    loaded_config: ConfigDefinition,
+    profiles: Mapping[str, ProfileDefinition],
+) -> Dict:
+    return {
+        "config": asdict(cfg),
+        "schema": {
+            "version": loaded_config.version,
+            "aliases": {
+                "stages": loaded_config.stage_aliases,
+                "factors": loaded_config.factor_aliases,
+                "risks": loaded_config.risk_aliases,
+            },
+            "scale": {
+                "relations": loaded_config.relation_scale,
+                "priorities": loaded_config.priority_scale,
+            },
+        },
+        "profiles": {
+            profile_id: {
+                "name": profile.name,
+                "description": profile.description,
+                "stage_expression": profile.expression,
+                "parsed_factor_rules": profile.parsed_factor_rules,
+                "parsed_risk_profile": profile.parsed_risk_profile,
+            }
+            for profile_id, profile in profiles.items()
+        },
+    }
+
+
 def run_montecarlo(cfg: MonteCarloConfig) -> Dict:
-    relation_strength = RelationStrength(equal=0, greater=cfg.stage_step, much_greater=cfg.stage_strong_step)
-    loaded_profiles = load_profiles(cfg.profiles_yaml, relation_strength=relation_strength)
+    loaded_config = load_config(cfg.config_yaml)
+    base_hierarchy = _load_base_hierarchy(cfg.base_yaml)
+    hierarchy_index = build_hierarchy_index(base_hierarchy, loaded_config)
+    loaded_profiles = load_profiles(cfg.profiles_yaml, config=loaded_config, hierarchy_index=hierarchy_index)
     profiles = _ensure_profile_subset(loaded_profiles, cfg.profile_ids)
 
     out_dir = Path(cfg.out_dir)
-    _write_settings(out_dir, cfg, profiles)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with (out_dir / "settings.json").open("w", encoding="utf-8") as f:
+        json.dump(_settings_payload(cfg, loaded_config, profiles), f, ensure_ascii=False, indent=2)
 
     if cfg.dry_run:
         return {
@@ -132,7 +145,6 @@ def run_montecarlo(cfg: MonteCarloConfig) -> Dict:
             "out_dir": str(out_dir),
         }
 
-    base_hierarchy = _load_base_hierarchy(cfg.base_yaml)
     variability = VariabilityConfig(
         stage_sigma=cfg.variability_strength,
         factor_sigma=cfg.variability_strength,
@@ -141,7 +153,11 @@ def run_montecarlo(cfg: MonteCarloConfig) -> Dict:
     generated_samples: List[GeneratedSample] = []
 
     for profile_id, profile in profiles.items():
-        bias_cfg: ProfileBiasConfig = get_profile_bias_config(profile_id, overrides=DEFAULT_PROFILE_BIASES)
+        bias_cfg = ProfileBiasConfig(
+            factor_scores_by_stage=profile.factor_scores_by_stage,
+            risk_scores_global={},
+            risk_scores_by_path=profile.risk_scores_by_path,
+        )
         samples = generate_samples_for_profile(
             base_hierarchy=base_hierarchy,
             profile=profile,

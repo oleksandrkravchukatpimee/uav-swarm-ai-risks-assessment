@@ -234,9 +234,12 @@ def generate_samples_for_profile(
         metadata = {
             "profile_id": profile.profile_id,
             "profile_name": profile.name,
+            "profile_description": profile.description,
             "profile_expression": profile.expression,
             "stage_scores": profile.stage_scores,
             "stage_pairwise_deltas": {f"{k[0]} -> {k[1]}": v for k, v in profile.stage_pairwise_deltas.items()},
+            "parsed_factor_rules": profile.parsed_factor_rules,
+            "parsed_risk_profile": profile.parsed_risk_profile,
             "factor_biases": bias_cfg.factor_scores_by_stage,
             "risk_biases_global": bias_cfg.risk_scores_global,
             "risk_biases_by_path": bias_cfg.risk_scores_by_path,

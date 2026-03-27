@@ -1,72 +1,84 @@
 # Monte Carlo Simulated-Expert AHP
 
 ## Overview
-This project now supports Monte Carlo simulation of expert AHP judgments for multiple profiles while preserving the existing single-run flow (`ahp_risk_analysis.py`).
+This project supports Monte Carlo simulation of expert AHP judgments for multiple profiles while preserving the single-run flow (`ahp_risk_analysis.py`).
 
-The Monte Carlo workflow:
-1. Reads a base hierarchy from YAML.
-2. Reads profile definitions from `profiles.yaml`.
-3. Applies profile-specific stage/factor/risk bias deltas.
-4. Adds random perturbations to existing pairwise comparisons.
-5. Runs AHP for each generated sample.
-6. Filters by consistency ratio (CR).
-7. Produces JSON/CSV summaries and a markdown report.
+Workflow:
+1. Read base hierarchy from `hierarchy.yaml`.
+2. Read schema/scale aliases from `config.yaml`.
+3. Read profile rules from `profiles.yaml`.
+4. Validate IDs and risk placement against the base hierarchy.
+5. Generate perturbed hierarchy variants per profile.
+6. Run AHP for each sample.
+7. Filter by CR threshold.
+8. Aggregate results into JSON/CSV/Markdown (+ optional charts).
 
-## Profiles file (`profiles.yaml`)
+## `config.yaml`
+`config.yaml` defines:
+- `version`
+- `aliases` for `stages`, `factors`, `risks`
+- `scale.relations` for expression operators (`=`, `>`, `>>`)
+- `scale.priorities` for risk levels (`low`, `medium`, `high`, `very_high`)
+
+Aliases are labels only. Stable internal IDs are used in profile rules.
+
+## `profiles.yaml`
+Top-level format:
+- `version`
+- profile entries (`P1`, `P2`, ...)
+
+Each profile supports:
+- `name`
+- `description`
+- `stages` expression, e.g. `KA = TR > OP > KS`
+- `factors` per stage, e.g. `OP: T >> H`
+- `risks` per stage/factor with symbolic levels
+
 Example:
 
 ```yaml
+version: 1
 P1:
   name: AI/ML-heavy
-  profile: KA = TR > OP > KS
-P2:
-  name: Swarm/Ops-heavy
-  profile: OP >> TR > KA > KS
+  description: Focus on uncertainty and calibration
+  stages: KA = TR > OP > KS
+  factors:
+    KS: H > T
+    OP: T >> H
+  risks:
+    KA:
+      T:
+        lack_of_uncertainty_estimation: very_high
 ```
 
-### Symbolic expression mapping
-`profile` expressions are parsed with:
-- `=`: equal priority (delta `0`)
-- `>`: moderate priority gap (delta `2` by default)
-- `>>`: strong priority gap (delta `4` by default)
-
-These values are configurable from CLI:
-- `--stage-step` for `>`
-- `--stage-strong-step` for `>>`
-
-Default stage code aliases:
-- `KS` -> `Knowledge selection`
-- `KA` -> `Knowledge analysis`
-- `TR` -> `AGPM Training`
-- `OP` -> `Model operation`
+## Rule interpretation
+- Stage/factor expressions use `config.scale.relations`.
+- Risk levels use `config.scale.priorities`.
+- Risk IDs are validated to belong to the exact stage/factor group in base hierarchy.
 
 ## Bias composition
-Each generated comparison value is adjusted as:
-1. Existing base value
-2. Plus deterministic profile bias delta
-3. Plus random perturbation noise
-4. Clamped to integer range `[-9, 9]`
+For each existing pairwise comparison:
+1. Start from base integer value.
+2. Add deterministic profile bias delta.
+3. Add random perturbation noise.
+4. Clamp to integer range `[-9, 9]`.
 
-Profile biases are split by scope:
-- Stage level (from `profiles.yaml` expression)
-- Factor level (code config)
-- Risk level (code config)
-
-Default factor/risk profile biases are defined in `montecarlo/biases.py`.
+No new hierarchy structure is invented; only existing comparison values are modified.
 
 ## CR filtering
-Filtering threshold defaults to `0.1`.
+Default threshold: `0.1`.
 
 Modes:
-- `any` (default): reject run if any matrix has `CR >= threshold`
-- `root_only`: reject run only by root matrix CR
+- `any`: reject if any matrix has `CR >= threshold`
+- `root_only`: reject only by root matrix CR
 
 ## CLI
-Entry point:
+Run:
 
 ```bash
 python -m ahp_cli montecarlo \
   --base in/hierarchy.yaml \
+  --config in/config.yaml \
   --profiles in/profiles.yaml \
   --samples 200 \
   --seed 42 \
@@ -82,8 +94,6 @@ Optional:
 - `--stop-on-error`
 
 ## Output structure
-Example output:
-
 ```text
 out/montecarlo/
   settings.json
@@ -104,33 +114,33 @@ out/montecarlo/
     cross_profile.json
     summary.json
     report.md
-    accepted_vs_generated.png            # optional (if matplotlib available)
-    mean_weight_heatmap.png              # optional (if matplotlib available)
-    top5_frequency_P1.png                # optional (if matplotlib available)
+    accepted_vs_generated.png            # optional
+    mean_weight_heatmap.png              # optional
+    top5_frequency_P1.png                # optional
 ```
 
 Per-sample metadata includes:
-- profile id/name/expression
-- parsed stage scores and pairwise deltas
-- factor/risk bias config applied
-- perturbation entries
+- profile id/name
+- parsed stage rule
+- parsed factor rules
+- parsed/applied risk-level biases
+- random perturbations
 - seed and sample index
 
 ## Analysis outputs
 Per profile:
-- generated/accepted counts and acceptance %
-- risk mean/std/median global weight
+- generated / accepted count and %
+- mean/std/median global risk weight
 - top-3/top-5/top-10 frequency
-- mean rank and rank stability
+- mean rank + rank stability
 
-Cross profile:
-- invariant risks (intersection of top-N)
-- profile-sensitive risks (large rank range)
-- rank correlations (Spearman rho, Kendall tau)
-- optional charts (if matplotlib is installed)
+Cross-profile:
+- invariant risks (top-N intersection)
+- profile-sensitive risks (rank-range threshold)
+- Spearman rho / Kendall tau correlations
 
 ## Single-run compatibility
-The original single-run pipeline remains available:
+Single-run flow is unchanged:
 
 ```bash
 python ahp_risk_analysis.py

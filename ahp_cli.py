@@ -14,6 +14,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     montecarlo = subparsers.add_parser("montecarlo", help="Run Monte Carlo simulated-expert AHP")
     montecarlo.add_argument("--base", default="in/hierarchy.yaml", help="Base hierarchy YAML path")
+    montecarlo.add_argument("--config", default="in/config.yaml", help="Config YAML path")
     montecarlo.add_argument("--profiles", default="in/profiles.yaml", help="Profiles YAML path")
     montecarlo.add_argument("--samples", type=int, default=200, help="Samples per profile")
     montecarlo.add_argument("--out", default="out/montecarlo", help="Output directory")
@@ -33,8 +34,6 @@ def _build_parser() -> argparse.ArgumentParser:
     montecarlo.add_argument("--cr-threshold", type=float, default=0.1, help="CR rejection threshold")
     montecarlo.add_argument("--dry-run", action="store_true", help="Parse config and print plan only")
     montecarlo.add_argument("--stop-on-error", action="store_true", help="Stop batch on first execution error")
-    montecarlo.add_argument("--stage-step", type=int, default=2, help="Bias delta for '>' relation")
-    montecarlo.add_argument("--stage-strong-step", type=int, default=4, help="Bias delta for '>>' relation")
     montecarlo.add_argument(
         "--log-level",
         default="INFO",
@@ -55,6 +54,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         profile_ids = [part.strip() for part in args.profile_ids.split(",") if part.strip()] or None
         config = MonteCarloConfig(
             base_yaml=args.base,
+            config_yaml=args.config,
             profiles_yaml=args.profiles,
             samples_per_profile=args.samples,
             out_dir=args.out,
@@ -65,8 +65,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             cr_mode=args.cr_mode,
             dry_run=args.dry_run,
             stop_on_error=args.stop_on_error,
-            stage_step=args.stage_step,
-            stage_strong_step=args.stage_strong_step,
         )
         payload = run_montecarlo(config)
         print(json.dumps(payload, ensure_ascii=False, indent=2))

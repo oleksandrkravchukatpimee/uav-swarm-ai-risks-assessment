@@ -1,23 +1,32 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 
-DEFAULT_STAGE_ALIASES: Dict[str, str] = {
-    "KS": "Knowledge selection",
-    "KA": "Knowledge analysis",
-    "TR": "AGPM Training",
-    "OP": "Model operation",
-}
+VALID_STAGE_IDS = {"KS", "KA", "TR", "OP"}
+VALID_FACTOR_IDS = {"H", "T"}
+REQUIRED_RELATION_TOKENS = {"=", ">", ">>"}
+REQUIRED_PRIORITY_LEVELS = {"low", "medium", "high", "very_high"}
 
 
 @dataclass(frozen=True)
-class RelationStrength:
-    equal: int = 0
-    greater: int = 2
-    much_greater: int = 4
+class ConfigDefinition:
+    version: int
+    stage_aliases: Dict[str, str]
+    factor_aliases: Dict[str, str]
+    risk_aliases: Dict[str, str]
+    relation_scale: Dict[str, int]
+    priority_scale: Dict[str, int]
+
+
+@dataclass(frozen=True)
+class HierarchyIndex:
+    stage_id_to_label: Dict[str, str]
+    factor_id_to_label: Dict[str, str]
+    risk_id_to_label: Dict[str, str]
+    risk_id_to_location_ids: Dict[str, Tuple[str, str]]
 
 
 @dataclass(frozen=True)
@@ -27,6 +36,11 @@ class ProfileDefinition:
     expression: str
     stage_scores: Dict[str, int]
     stage_pairwise_deltas: Dict[Tuple[str, str], int]
+    description: str = ""
+    factor_scores_by_stage: Dict[str, Dict[str, int]] = field(default_factory=dict)
+    risk_scores_by_path: Dict[str, Dict[str, int]] = field(default_factory=dict)
+    parsed_factor_rules: Dict[str, str] = field(default_factory=dict)
+    parsed_risk_profile: Dict[str, Dict[str, Dict[str, int]]] = field(default_factory=dict)
 
 
 def _tokenize_expression(expression: str) -> List[str]:
@@ -61,13 +75,13 @@ def _tokenize_expression(expression: str) -> List[str]:
     return tokens
 
 
-def parse_stage_expression(
+def parse_relation_expression(
     expression: str,
-    stage_aliases: Mapping[str, str] | None = None,
-    relation_strength: RelationStrength | None = None,
+    valid_ids: Mapping[str, str],
+    relation_scale: Mapping[str, int],
 ) -> Dict[str, int]:
-    aliases = dict(stage_aliases or DEFAULT_STAGE_ALIASES)
-    strengths = relation_strength or RelationStrength()
+    aliases = dict(valid_ids)
+    relations = dict(relation_scale)
     tokens = _tokenize_expression(expression)
 
     if len(tokens) < 3:
@@ -100,12 +114,9 @@ def parse_stage_expression(
     scores_by_code[stage_codes[0]] = current_score
 
     for op, stage_code in zip(operators, stage_codes[1:]):
-        if op == "=":
-            step = strengths.equal
-        elif op == ">":
-            step = strengths.greater
-        else:
-            step = strengths.much_greater
+        if op not in relations:
+            raise ValueError(f"Relation '{op}' is not configured in config.scale.relations")
+        step = int(relations[op])
         current_score -= step
         scores_by_code[stage_code] = current_score
 
@@ -123,10 +134,136 @@ def stage_pairwise_deltas(stage_scores: Mapping[str, int]) -> Dict[Tuple[str, st
     return deltas
 
 
+def load_config(config_path: str | Path) -> ConfigDefinition:
+    import yaml
+
+    path = Path(config_path)
+    with path.open("r", encoding="utf-8") as f:
+        raw = yaml.safe_load(f) or {}
+
+    if not isinstance(raw, dict):
+        raise ValueError(f"Config file '{path}' must contain a mapping")
+
+    version = raw.get("version")
+    if version != 1:
+        raise ValueError(f"Unsupported config version '{version}'. Expected version=1")
+
+    aliases = raw.get("aliases")
+    if not isinstance(aliases, dict):
+        raise ValueError("config.aliases must be a mapping")
+
+    stage_aliases = aliases.get("stages")
+    factor_aliases = aliases.get("factors")
+    risk_aliases = aliases.get("risks")
+    if not isinstance(stage_aliases, dict):
+        raise ValueError("config.aliases.stages must be a mapping")
+    if not isinstance(factor_aliases, dict):
+        raise ValueError("config.aliases.factors must be a mapping")
+    if not isinstance(risk_aliases, dict):
+        raise ValueError("config.aliases.risks must be a mapping")
+
+    unknown_stage_ids = set(stage_aliases) - VALID_STAGE_IDS
+    missing_stage_ids = VALID_STAGE_IDS - set(stage_aliases)
+    if unknown_stage_ids or missing_stage_ids:
+        raise ValueError(
+            f"Invalid stage ids in config.aliases.stages. Unknown={sorted(unknown_stage_ids)}, missing={sorted(missing_stage_ids)}"
+        )
+
+    unknown_factor_ids = set(factor_aliases) - VALID_FACTOR_IDS
+    missing_factor_ids = VALID_FACTOR_IDS - set(factor_aliases)
+    if unknown_factor_ids or missing_factor_ids:
+        raise ValueError(
+            f"Invalid factor ids in config.aliases.factors. Unknown={sorted(unknown_factor_ids)}, missing={sorted(missing_factor_ids)}"
+        )
+
+    scale = raw.get("scale")
+    if not isinstance(scale, dict):
+        raise ValueError("config.scale must be a mapping")
+    relations = scale.get("relations")
+    priorities = scale.get("priorities")
+    if not isinstance(relations, dict):
+        raise ValueError("config.scale.relations must be a mapping")
+    if not isinstance(priorities, dict):
+        raise ValueError("config.scale.priorities must be a mapping")
+
+    if REQUIRED_RELATION_TOKENS - set(relations):
+        raise ValueError(f"config.scale.relations must define {sorted(REQUIRED_RELATION_TOKENS)}")
+    if REQUIRED_PRIORITY_LEVELS - set(priorities):
+        raise ValueError(f"config.scale.priorities must define {sorted(REQUIRED_PRIORITY_LEVELS)}")
+
+    relation_scale: Dict[str, int] = {}
+    for key, value in relations.items():
+        relation_scale[str(key)] = int(value)
+
+    priority_scale: Dict[str, int] = {}
+    for key, value in priorities.items():
+        priority_scale[str(key)] = int(value)
+
+    return ConfigDefinition(
+        version=1,
+        stage_aliases={str(k): str(v) for k, v in stage_aliases.items()},
+        factor_aliases={str(k): str(v) for k, v in factor_aliases.items()},
+        risk_aliases={str(k): str(v) for k, v in risk_aliases.items()},
+        relation_scale=relation_scale,
+        priority_scale=priority_scale,
+    )
+
+
+def build_hierarchy_index(hierarchy: Mapping[str, Any], config: ConfigDefinition) -> HierarchyIndex:
+    if not isinstance(hierarchy, dict):
+        raise ValueError("Base hierarchy must be a mapping")
+
+    reverse_stage = {label: stage_id for stage_id, label in config.stage_aliases.items()}
+    reverse_factor = {label: factor_id for factor_id, label in config.factor_aliases.items()}
+
+    missing_stage_labels = [label for label in config.stage_aliases.values() if label not in hierarchy]
+    if missing_stage_labels:
+        raise ValueError(f"Configured stage labels missing in hierarchy: {missing_stage_labels}")
+
+    risk_label_to_location: Dict[str, Tuple[str, str]] = {}
+    for stage_label, stage_node in hierarchy.items():
+        if not isinstance(stage_node, dict):
+            continue
+        factors = stage_node.get("factors")
+        if not isinstance(factors, dict):
+            continue
+        for factor_label, factor_node in factors.items():
+            if factor_label not in reverse_factor:
+                raise ValueError(f"Unknown factor label '{factor_label}' in hierarchy '{stage_label}'")
+            if not isinstance(factor_node, dict):
+                continue
+            risks = factor_node.get("risks")
+            if not isinstance(risks, dict):
+                continue
+            for risk_label in risks.keys():
+                if risk_label in risk_label_to_location:
+                    prev = risk_label_to_location[risk_label]
+                    raise ValueError(
+                        f"Risk label '{risk_label}' appears multiple times in hierarchy: {prev} and {(stage_label, factor_label)}"
+                    )
+                risk_label_to_location[str(risk_label)] = (str(stage_label), str(factor_label))
+
+    risk_id_to_location_ids: Dict[str, Tuple[str, str]] = {}
+    for risk_id, risk_label in config.risk_aliases.items():
+        if risk_label not in risk_label_to_location:
+            raise ValueError(f"Configured risk alias '{risk_id}' -> '{risk_label}' not found in base hierarchy")
+        stage_label, factor_label = risk_label_to_location[risk_label]
+        if stage_label not in reverse_stage:
+            raise ValueError(f"Hierarchy stage '{stage_label}' has no configured stage alias id")
+        risk_id_to_location_ids[risk_id] = (reverse_stage[stage_label], reverse_factor[factor_label])
+
+    return HierarchyIndex(
+        stage_id_to_label=dict(config.stage_aliases),
+        factor_id_to_label=dict(config.factor_aliases),
+        risk_id_to_label=dict(config.risk_aliases),
+        risk_id_to_location_ids=risk_id_to_location_ids,
+    )
+
+
 def load_profiles(
     profiles_path: str | Path,
-    stage_aliases: Mapping[str, str] | None = None,
-    relation_strength: RelationStrength | None = None,
+    config: ConfigDefinition,
+    hierarchy_index: HierarchyIndex,
 ) -> Dict[str, ProfileDefinition]:
     import yaml
 
@@ -137,25 +274,133 @@ def load_profiles(
     if not isinstance(raw, dict):
         raise ValueError(f"Profiles file '{path}' must contain a mapping of profile ids")
 
+    version = raw.get("version")
+    if version != config.version:
+        raise ValueError(f"Profiles version '{version}' is incompatible with config version '{config.version}'")
+
+    profile_entries = {k: v for k, v in raw.items() if k != "version"}
+    if not profile_entries:
+        raise ValueError(f"Profiles file '{path}' does not contain profile entries")
+
     profiles: Dict[str, ProfileDefinition] = {}
-    for profile_id, payload in raw.items():
+    for profile_id, payload in profile_entries.items():
         if not isinstance(payload, dict):
             raise ValueError(f"Profile '{profile_id}' must be a mapping")
 
         name = payload.get("name")
-        expression = payload.get("profile")
+        description = payload.get("description", "")
+        expression = payload.get("stages", payload.get("profile"))
         if not name or not isinstance(name, str):
             raise ValueError(f"Profile '{profile_id}' missing string field 'name'")
         if not expression or not isinstance(expression, str):
-            raise ValueError(f"Profile '{profile_id}' missing string field 'profile'")
+            raise ValueError(f"Profile '{profile_id}' missing string field 'stage_profile' (or 'stages')")
 
-        stage_scores = parse_stage_expression(expression, stage_aliases=stage_aliases, relation_strength=relation_strength)
+        stage_scores = parse_relation_expression(
+            expression=expression,
+            valid_ids=config.stage_aliases,
+            relation_scale=config.relation_scale,
+        )
+        if set(stage_scores) != set(config.stage_aliases.values()):
+            raise ValueError(
+                f"Profile '{profile_id}' stage expression must include all stages: {sorted(config.stage_aliases)}"
+            )
+
+        factor_rules_raw = payload.get("factors", {})
+        if factor_rules_raw is None:
+            factor_rules_raw = {}
+        if not isinstance(factor_rules_raw, dict):
+            raise ValueError(f"Profile '{profile_id}' field 'factor_profile' must be a mapping")
+
+        factor_scores_by_stage: Dict[str, Dict[str, int]] = {}
+        parsed_factor_rules: Dict[str, str] = {}
+        for stage_id, factor_expr in factor_rules_raw.items():
+            stage_id_str = str(stage_id)
+            if stage_id_str not in config.stage_aliases:
+                raise ValueError(f"Profile '{profile_id}' factor rule uses unknown stage id '{stage_id_str}'")
+            if not isinstance(factor_expr, str):
+                raise ValueError(f"Profile '{profile_id}' factor rule for stage '{stage_id_str}' must be a string expression")
+
+            parsed = parse_relation_expression(
+                expression=factor_expr,
+                valid_ids=config.factor_aliases,
+                relation_scale=config.relation_scale,
+            )
+            if set(parsed) != set(config.factor_aliases.values()):
+                raise ValueError(
+                    f"Profile '{profile_id}' factor expression for stage '{stage_id_str}' must include all factors: {sorted(config.factor_aliases)}"
+                )
+            factor_scores_by_stage[config.stage_aliases[stage_id_str]] = parsed
+            parsed_factor_rules[stage_id_str] = factor_expr
+
+        risk_rules_raw = payload.get("risks", {})
+        if risk_rules_raw is None:
+            risk_rules_raw = {}
+        if not isinstance(risk_rules_raw, dict):
+            raise ValueError(f"Profile '{profile_id}' field 'risk_profile' must be a mapping")
+
+        risk_scores_by_path: Dict[str, Dict[str, int]] = {}
+        parsed_risk_profile: Dict[str, Dict[str, Dict[str, int]]] = {}
+        for stage_id, stage_payload in risk_rules_raw.items():
+            stage_id_str = str(stage_id)
+            if stage_id_str not in config.stage_aliases:
+                raise ValueError(f"Profile '{profile_id}' risk rules use unknown stage id '{stage_id_str}'")
+            if not isinstance(stage_payload, dict):
+                raise ValueError(f"Profile '{profile_id}' risk rules for stage '{stage_id_str}' must be a mapping")
+
+            parsed_risk_profile[stage_id_str] = {}
+            for factor_id, factor_payload in stage_payload.items():
+                factor_id_str = str(factor_id)
+                if factor_id_str not in config.factor_aliases:
+                    raise ValueError(
+                        f"Profile '{profile_id}' risk rules use unknown factor id '{factor_id_str}' in stage '{stage_id_str}'"
+                    )
+                if not isinstance(factor_payload, dict):
+                    raise ValueError(
+                        f"Profile '{profile_id}' risk rules for '{stage_id_str}/{factor_id_str}' must be a mapping"
+                    )
+
+                parsed_risk_profile[stage_id_str][factor_id_str] = {}
+                path_key = f"{config.stage_aliases[stage_id_str]} / {config.factor_aliases[factor_id_str]}"
+                if path_key not in risk_scores_by_path:
+                    risk_scores_by_path[path_key] = {}
+
+                for risk_id, level in factor_payload.items():
+                    risk_id_str = str(risk_id)
+                    if risk_id_str not in config.risk_aliases:
+                        raise ValueError(
+                            f"Profile '{profile_id}' risk rules use unknown risk id '{risk_id_str}' in '{stage_id_str}/{factor_id_str}'"
+                        )
+                    if risk_id_str not in hierarchy_index.risk_id_to_location_ids:
+                        raise ValueError(
+                            f"Profile '{profile_id}' risk '{risk_id_str}' is not present in base hierarchy aliases"
+                        )
+                    if hierarchy_index.risk_id_to_location_ids[risk_id_str] != (stage_id_str, factor_id_str):
+                        expected = hierarchy_index.risk_id_to_location_ids[risk_id_str]
+                        raise ValueError(
+                            f"Profile '{profile_id}' risk '{risk_id_str}' placed under '{stage_id_str}/{factor_id_str}', "
+                            f"but hierarchy defines it under '{expected[0]}/{expected[1]}'"
+                        )
+                    level_key = str(level)
+                    if level_key not in config.priority_scale:
+                        raise ValueError(
+                            f"Profile '{profile_id}' risk '{risk_id_str}' uses unknown priority level '{level_key}'"
+                        )
+                    priority_value = int(config.priority_scale[level_key])
+                    risk_label = config.risk_aliases[risk_id_str]
+                    risk_scores_by_path[path_key][risk_label] = priority_value
+                    parsed_risk_profile[stage_id_str][factor_id_str][risk_id_str] = priority_value
+
         profiles[profile_id] = ProfileDefinition(
             profile_id=profile_id,
             name=name,
+            description=description if isinstance(description, str) else "",
             expression=expression,
             stage_scores=stage_scores,
             stage_pairwise_deltas=stage_pairwise_deltas(stage_scores),
+            factor_scores_by_stage=factor_scores_by_stage,
+            risk_scores_by_path=risk_scores_by_path,
+            parsed_factor_rules=parsed_factor_rules,
+            parsed_risk_profile=parsed_risk_profile,
         )
 
     return profiles
