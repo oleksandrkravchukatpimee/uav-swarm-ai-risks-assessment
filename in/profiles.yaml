@@ -25,10 +25,10 @@ P1:
       H:
         annotation_errors: medium
         inadequate_model_architecture: high
-        lack_of_uncertainty_estimation: very_high
+        lack_of_uncertainty_estimation: high
       T:
         feature_leakage: medium
-        incorrect_spatial_geometric_interpretation: very_high
+        incorrect_spatial_geometric_interpretation: high
 
     TR:
       H:
