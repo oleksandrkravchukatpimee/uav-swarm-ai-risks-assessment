@@ -4,108 +4,108 @@
 #  compare:
 #    "Stage Y": Fyx       # Fyx > 0 means "Stage Y" is more important than "Stage X"
 #  factors:
-#    "Technological":
+#    T:
 #      compare:
-#        "Human": Fht     # Fht < 0 means "Human" is less important than "Technological"
+#        H: Fht     # Fht < 0 means H is less important than T
 #      risks: # empty
 #
 # Fab - impoprtance factor, i.e. how risk A is more important than risk B
 # when Fab = 0, risk A equals to risk B
 # when Fab < 0, risk A is less important than risk B
 # when Fab > 0, risk A is more important than risk B
-"Knowledge selection":
+KS:
   factors:
-    "Human":
+    H:
       risks:
-        "Data representativeness": {}
-        "Dataset bias":
+        representativeness: {}
+        dataset_bias:
           compare:
-            "Data representativeness": 1
-        "Temporal bias":
+            representativeness: 1
+        temporal_bias:
           compare:
-            "Data representativeness": 2
-            "Dataset bias": 2
-        "Scale mismatch":
+            representativeness: 2
+            dataset_bias: 2
+        scale_mismatch:
           compare:
-            "Data representativeness": 2
-            "Dataset bias": 2
-            "Temporal bias": 1
-        "Limited scene diversity":
+            representativeness: 2
+            dataset_bias: 2
+            temporal_bias: 1
+        limited_scene_diversity:
           compare:
-            "Data representativeness": 3
-            "Dataset bias": 3
-            "Temporal bias": -2
-            "Scale mismatch": -2
-"Knowledge analysis":
+            representativeness: 3
+            dataset_bias: 3
+            temporal_bias: -2
+            scale_mismatch: -2
+KA:
   compare:
-    "Knowledge selection": -2
+    KS: -2
   factors:
-    "Human":
+    H:
       risks:
-        "Annotation errors": {}
-        "Inadequate model architecture":
+        annotation_errors: {}
+        inadequate_model_architecture:
           compare:
-            "Annotation errors": -7
-        "Lack of uncertainty estimation":
+            annotation_errors: -7
+        lack_of_uncertainty_estimation:
           compare:
-            "Annotation errors": 3
-            "Inadequate model architecture": 9
-    "Technological":
+            annotation_errors: 3
+            inadequate_model_architecture: 9
+    T:
       compare:
-        "Human": 5
+        H: 5
       risks:
-        "Feature leakage":
-        "Incorrect spatial-geometric interpretation":
+        feature_leakage:
+        incorrect_spatial_geometric_interpretation:
           compare:
-            "Feature leakage": 2
+            feature_leakage: 2
 
-"AGPM Training":
+TR:
   compare:
-    "Knowledge selection": -3
-    "Knowledge analysis": -2
+    KS: -3
+    KA: -2
   factors:
-    "Human":
+    H:
       risks:
-        "Domain shift":
-        "Incomplete validation criteria":
+        domain_shift:
+        incomplete_validation_criteria:
           compare:
-            "Domain shift": -2
-    "Technological":
+            domain_shift: -2
+    T:
       compare:
-        "Human": -3
+        H: -3
       risks:
-        "Overfitting":
-        "Confabulations":
+        overfitting:
+        confabulations:
           compare:
-            "Overfitting": -4
-        "Confidence miscalibration":
+            overfitting: -4
+        confidence_miscalibration:
           compare:
-            "Overfitting": 2
-            "Confabulations": 5
-        "Catastrophic forgetting":
+            overfitting: 2
+            confabulations: 5
+        catastrophic_forgetting:
           compare:
-            "Overfitting": -5
-            "Confabulations": -3
-            "Confidence miscalibration": -7
+            overfitting: -5
+            confabulations: -3
+            confidence_miscalibration: -7
 
-"Model operation":
+OP:
   compare:
-    "Knowledge selection": -3
-    "Knowledge analysis": -3
-    "AGPM Training": -4
+    KS: -3
+    KA: -3
+    TR: -4
   factors:
-    "Human":
+    H:
       risks:
-        "Loss of situational awareness":
-    "Technological":
+        loss_of_situational_awareness:
+    T:
       compare:
-        "Human": -7
+        H: -7
       risks:
-        "Sensor artifacts": {}
-        "Concept drift":
+        sensor_artifacts: {}
+        concept_drift:
           compare:
-            "Sensor artifacts": 3
-        "Cascading error propagation":
+            sensor_artifacts: 3
+        cascading_error_propagation:
           compare:
-            "Sensor artifacts": -4
-            "Concept drift": -5
+            sensor_artifacts: -4
+            concept_drift: -5

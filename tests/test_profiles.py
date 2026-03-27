@@ -39,20 +39,20 @@ scale:
     very_high: 4
 """
         self.hierarchy = {
-            "Knowledge selection": {
+            "KS": {
                 "factors": {
-                    "Human": {"risks": {"Data representativeness": {}}},
-                    "Technological": {"risks": {}},
+                    "H": {"risks": {"representativeness": {}}},
+                    "T": {"risks": {}},
                 }
             },
-            "Knowledge analysis": {
+            "KA": {
                 "factors": {
-                    "Human": {"risks": {}},
-                    "Technological": {"risks": {"Confabulations": {}}},
+                    "H": {"risks": {}},
+                    "T": {"risks": {"confabulations": {}}},
                 }
             },
-            "AGPM Training": {"factors": {"Human": {"risks": {}}, "Technological": {"risks": {}}}},
-            "Model operation": {"factors": {"Human": {"risks": {}}, "Technological": {"risks": {}}}},
+            "TR": {"factors": {"H": {"risks": {}}, "T": {"risks": {}}}},
+            "OP": {"factors": {"H": {"risks": {}}, "T": {"risks": {}}}},
         }
         self.valid_profiles = """
 version: 1
@@ -85,10 +85,10 @@ P1:
             valid_ids={"KA": "Knowledge analysis", "TR": "AGPM Training", "OP": "Model operation", "KS": "Knowledge selection"},
             relation_scale={"=": 0, ">": 2, ">>": 4},
         )
-        self.assertEqual(scores["Knowledge analysis"], 0)
-        self.assertEqual(scores["AGPM Training"], 0)
-        self.assertEqual(scores["Model operation"], -2)
-        self.assertEqual(scores["Knowledge selection"], -4)
+        self.assertEqual(scores["KA"], 0)
+        self.assertEqual(scores["TR"], 0)
+        self.assertEqual(scores["OP"], -2)
+        self.assertEqual(scores["KS"], -4)
 
     def test_stage_pairwise_deltas(self):
         deltas = stage_pairwise_deltas({"A": 0, "B": -2, "C": -4})
@@ -108,13 +108,13 @@ P1:
             index = build_hierarchy_index(self.hierarchy, cfg)
             profiles = load_profiles(profiles_path, config=cfg, hierarchy_index=index)
             self.assertIn("P1", profiles)
-            self.assertIn("Knowledge analysis", profiles["P1"].stage_scores)
+            self.assertIn("KA", profiles["P1"].stage_scores)
             self.assertEqual(
-                profiles["P1"].factor_scores_by_stage["Knowledge selection"]["Human"],
+                profiles["P1"].factor_scores_by_stage["KS"]["H"],
                 0,
             )
-            self.assertIn("Knowledge analysis / Technological", profiles["P1"].risk_scores_by_path)
-            self.assertEqual(profiles["P1"].risk_scores_by_path["Knowledge analysis / Technological"]["Confabulations"], 4)
+            self.assertIn("KA / T", profiles["P1"].risk_scores_by_path)
+            self.assertEqual(profiles["P1"].risk_scores_by_path["KA / T"]["confabulations"], 4)
 
     def test_invalid_config_unknown_stage_id(self):
         try:
