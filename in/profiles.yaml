@@ -1,0 +1,17 @@
+P1:
+  name: AI/ML-heavy
+  profile: KA = TR > OP > KS
+P2:
+  name: Swarm/Ops-heavy
+  profile: OP >> TR > KA > KS
+P3:
+  name: Balanced
+  profile: OP > TR = KA > KS
+P4:
+  name: Safety/Validation-heavy
+  profile: OP = TR = KA > KS
+
+#  - **P1 AI/ML-heavy:** KA ≈ TR > OP > KS
+#  - **P2 Swarm/Ops-heavy:** OP >> TR > KA > KS
+#  - **P3 Balanced:** OP > TR ≈ KA > KS, але без сильного домінування
+#  - **P4 Safety/Validation-heavy:** OP ≈ TR ≈ KA > KS

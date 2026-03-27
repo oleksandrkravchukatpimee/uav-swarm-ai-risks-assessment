@@ -3,10 +3,10 @@ from exporters import ExcelExporter, PlantUMLExporter
 
 
 if __name__ == "__main__":
-    yaml_path = "hierarchy.yaml"  # Update path if needed
-    excel_path = "results/AHP_Results_Final.xlsx"
-    csv_path = "results/AHP_Global_Weights_Final.csv"
-    uml_path = "results/AHP_Risks_Mindmap.puml"
+    yaml_path = "in/hierarchy.yaml"  # Update path if needed
+    excel_path = "out/AHP_Results_Final.xlsx"
+    csv_path = "out/AHP_Global_Weights_Final.csv"
+    uml_path = "out/AHP_Risks_Mindmap.puml"
 
     analyzer = AHPAnalyzer()
     hierarchy = analyzer.load_hierarchy(yaml_path)
