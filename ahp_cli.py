@@ -14,7 +14,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     montecarlo = subparsers.add_parser("montecarlo", help="Run Monte Carlo simulated-expert AHP")
     montecarlo.add_argument("--base", default="in/hierarchy.yaml", help="Base hierarchy YAML path")
-    montecarlo.add_argument("--profiles", default="in/profiles.yml", help="Profiles YAML path")
+    montecarlo.add_argument("--profiles", default="in/profiles.yaml", help="Profiles YAML path")
     montecarlo.add_argument("--samples", type=int, default=200, help="Samples per profile")
     montecarlo.add_argument("--out", default="out/montecarlo", help="Output directory")
     montecarlo.add_argument("--seed", type=int, default=42, help="Random seed")

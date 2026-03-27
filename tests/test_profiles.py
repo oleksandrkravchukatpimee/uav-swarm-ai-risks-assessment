@@ -40,7 +40,7 @@ P1:
   profile: KA = TR > OP > KS
 """
         with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "profiles.yml"
+            path = Path(tmp) / "profiles.yaml"
             path.write_text(payload, encoding="utf-8")
             profiles = load_profiles(path)
             self.assertIn("P1", profiles)

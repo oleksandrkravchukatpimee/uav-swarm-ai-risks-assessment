@@ -5,14 +5,14 @@ This project now supports Monte Carlo simulation of expert AHP judgments for mul
 
 The Monte Carlo workflow:
 1. Reads a base hierarchy from YAML.
-2. Reads profile definitions from `profiles.yml`.
+2. Reads profile definitions from `profiles.yaml`.
 3. Applies profile-specific stage/factor/risk bias deltas.
 4. Adds random perturbations to existing pairwise comparisons.
 5. Runs AHP for each generated sample.
 6. Filters by consistency ratio (CR).
 7. Produces JSON/CSV summaries and a markdown report.
 
-## Profiles file (`profiles.yml`)
+## Profiles file (`profiles.yaml`)
 Example:
 
 ```yaml
@@ -48,7 +48,7 @@ Each generated comparison value is adjusted as:
 4. Clamped to integer range `[-9, 9]`
 
 Profile biases are split by scope:
-- Stage level (from `profiles.yml` expression)
+- Stage level (from `profiles.yaml` expression)
 - Factor level (code config)
 - Risk level (code config)
 
@@ -67,7 +67,7 @@ Entry point:
 ```bash
 python -m ahp_cli montecarlo \
   --base in/hierarchy.yaml \
-  --profiles in/profiles.yml \
+  --profiles in/profiles.yaml \
   --samples 200 \
   --seed 42 \
   --out out/montecarlo \
