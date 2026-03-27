@@ -1,0 +1,102 @@
+"Knowledge selection":
+  items:
+    "Human":
+      items:
+        "Data representativeness":
+        "Dataset bias":
+          compare:
+            - [ "Data representativeness", "1" ]
+        "Temporal bias":
+          compare:
+            # "Data representativeness" more important than "Temporal bias"
+            - [ "Data representativeness", "2" ]
+            - [ "Dataset bias", "2" ]
+        "Scale mismatch":
+          compare:
+            - [ "Data representativeness", "2" ]
+            - [ "Dataset bias", "2" ]
+            - [ "Temporal bias", "1" ]
+        "Limited scene diversity":
+          compare:
+            - ["Data representativeness", "3"]
+            - ["Dataset bias", "3"]
+            - ["Temporal bias", "-2"]
+            - ["Scale mismatch", "-2"]
+#    "Technological":
+#      compare:
+#        - ["Human", 1]
+#      items: # empty
+"Knowledge analysis":
+  compare:
+    # "Knowledge selection" less important than "Knowledge analysis"
+    - ["Knowledge selection", "-2"]
+  items:
+    "Human":
+      items:
+        "Annotation errors":
+        "Inadequate model architecture":
+          compare:
+            - ["Annotation errors", "-7"]
+        "Lack of uncertainty estimation":
+          compare:
+            - ["Annotation errors", "3"]
+            - ["Inadequate model architecture", "9"]
+    "Technological":
+      compare:
+        - ["Human", "5"]
+      items:
+        "Feature leakage":
+        "Incorrect spatial-geometric interpretation":
+          compare:
+            - ["Feature leakage", "2"]
+
+"AGPM Training":
+  compare:
+    - ["Knowledge selection", "-3"]
+    - ["Knowledge analysis", "-2"]
+  items:
+    "Human":
+      items:
+        "Domain shift":
+        "Incomplete validation criteria":
+          compare:
+            - ["Domain shift", "-2"]
+    "Technological":
+      compare:
+        - [ "Human", "-3"]
+      items:
+        "Overfitting":
+        "Confabulations":
+          compare:
+            - ["Overfitting", "-4"]
+        "Confidence miscalibration":
+          compare:
+            - ["Overfitting", "2"]
+            - ["Confabulations", "5"]
+        "Catastrophic forgetting":
+          compare:
+            - ["Overfitting", "-5"]
+            - ["Confabulations", "-3"]
+            - ["Confidence miscalibration", "-7"]
+
+"Model operation":
+  compare:
+    - ["Knowledge selection", "-3"]
+    - ["Knowledge analysis", "-3"]
+    - ["AGPM Training", "-4"]
+  items:
+    "Human":
+      items:
+        "Loss of situational awareness":
+    "Technological":
+      compare:
+        - ["Human", "-7"]
+      items:
+        "Sensor artifacts":
+        "Concept drift":
+          compare:
+            - [ "Sensor artifacts", "3" ]
+        "Cascading error propagation":
+          compare:
+            - [ "Sensor artifacts", "-4" ]
+            - [ "Concept drift", "-5" ]
