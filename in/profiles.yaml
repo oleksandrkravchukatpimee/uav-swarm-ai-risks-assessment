@@ -1,17 +1,193 @@
+version: 1
+
 P1:
   name: AI/ML-heavy
-  profile: KA = TR > OP > KS
+  description: Focus on uncertainty, calibration, confabulations, and model-related risks.
+
+  stages: KA = TR > OP > KS
+
+  factors:
+    KS: H > T
+    KA: T > H
+    TR: T > H
+    OP: T > H
+
+  risks:
+    KS:
+      H:
+        representativeness: high
+        dataset_bias: high
+        temporal_bias: medium
+        scale_mismatch: medium
+        limited_scene_diversity: medium
+
+    KA:
+      H:
+        annotation_errors: medium
+      T:
+        inadequate_model_architecture: high
+        lack_of_uncertainty_estimation: very_high
+        feature_leakage: medium
+        incorrect_spatial_geometric_interpretation: very_high
+
+    TR:
+      H:
+        domain_shift: high
+        incomplete_validation_criteria: high
+      T:
+        overfitting: medium
+        confabulations: very_high
+        confidence_miscalibration: very_high
+        catastrophic_forgetting: low
+
+    OP:
+      H:
+        loss_of_situational_awareness: medium
+      T:
+        sensor_artifacts: medium
+        concept_drift: medium
+        cascading_error_propagation: high
+
 P2:
   name: Swarm/Ops-heavy
-  profile: OP >> TR > KA > KS
+  description: Focus on operation-stage risks, coordination failures, and cascading effects in the swarm.
+
+  stages: OP >> TR > KA > KS
+
+  factors:
+    KS: H > T
+    KA: T > H
+    TR: T > H
+    OP: T >> H
+
+  risks:
+    KS:
+      H:
+        representativeness: medium
+        dataset_bias: medium
+        temporal_bias: low
+        scale_mismatch: low
+        limited_scene_diversity: low
+
+    KA:
+      H:
+        annotation_errors: low
+      T:
+        inadequate_model_architecture: medium
+        lack_of_uncertainty_estimation: medium
+        feature_leakage: low
+        incorrect_spatial_geometric_interpretation: medium
+
+    TR:
+      H:
+        domain_shift: medium
+        incomplete_validation_criteria: medium
+      T:
+        overfitting: medium
+        confabulations: medium
+        confidence_miscalibration: medium
+        catastrophic_forgetting: low
+
+    OP:
+      H:
+        loss_of_situational_awareness: high
+      T:
+        sensor_artifacts: high
+        concept_drift: high
+        cascading_error_propagation: very_high
+
 P3:
   name: Balanced
-  profile: OP > TR = KA > KS
+  description: Balanced profile with moderate priorities across the lifecycle and risk groups.
+
+  stages: OP > TR = KA > KS
+
+  factors:
+    KS: H = T
+    KA: T = H
+    TR: T = H
+    OP: T > H
+
+  risks:
+    KS:
+      H:
+        representativeness: medium
+        dataset_bias: medium
+        temporal_bias: medium
+        scale_mismatch: medium
+        limited_scene_diversity: medium
+
+    KA:
+      H:
+        annotation_errors: medium
+      T:
+        inadequate_model_architecture: medium
+        lack_of_uncertainty_estimation: medium
+        feature_leakage: medium
+        incorrect_spatial_geometric_interpretation: medium
+
+    TR:
+      H:
+        domain_shift: medium
+        incomplete_validation_criteria: medium
+      T:
+        overfitting: medium
+        confabulations: medium
+        confidence_miscalibration: medium
+        catastrophic_forgetting: low
+
+    OP:
+      H:
+        loss_of_situational_awareness: medium
+      T:
+        sensor_artifacts: medium
+        concept_drift: medium
+        cascading_error_propagation: high
+
 P4:
   name: Safety/Validation-heavy
-  profile: OP = TR = KA > KS
+  description: Focus on uncertainty handling, validation quality, safety constraints, and fallback behavior.
 
-#  - **P1 AI/ML-heavy:** KA ≈ TR > OP > KS
-#  - **P2 Swarm/Ops-heavy:** OP >> TR > KA > KS
-#  - **P3 Balanced:** OP > TR ≈ KA > KS, але без сильного домінування
-#  - **P4 Safety/Validation-heavy:** OP ≈ TR ≈ KA > KS
+  stages: OP = TR = KA > KS
+
+  factors:
+    KS: H = T
+    KA: T > H
+    TR: T > H
+    OP: T = H
+
+  risks:
+    KS:
+      H:
+        representativeness: medium
+        dataset_bias: medium
+        temporal_bias: medium
+        scale_mismatch: low
+        limited_scene_diversity: low
+
+    KA:
+      H:
+        annotation_errors: medium
+      T:
+        inadequate_model_architecture: medium
+        lack_of_uncertainty_estimation: very_high
+        feature_leakage: low
+        incorrect_spatial_geometric_interpretation: high
+
+    TR:
+      H:
+        domain_shift: medium
+        incomplete_validation_criteria: very_high
+      T:
+        overfitting: low
+        confabulations: high
+        confidence_miscalibration: very_high
+        catastrophic_forgetting: low
+
+    OP:
+      H:
+        loss_of_situational_awareness: high
+      T:
+        sensor_artifacts: medium
+        concept_drift: medium
+        cascading_error_propagation: high

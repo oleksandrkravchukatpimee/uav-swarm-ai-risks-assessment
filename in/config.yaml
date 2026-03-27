@@ -1,0 +1,49 @@
+version: 1
+
+aliases:
+  stages:
+    KS: Knowledge selection
+    KA: Knowledge analysis
+    TR: AGPM Training
+    OP: Model operation
+
+  factors:
+    H: Human
+    T: Technological
+
+  risks:
+    representativeness: Data representativeness
+    dataset_bias: Dataset bias
+    temporal_bias: Temporal bias
+    scale_mismatch: Scale mismatch
+    limited_scene_diversity: Limited scene diversity
+
+    annotation_errors: Annotation errors
+    inadequate_model_architecture: Inadequate model architecture
+    lack_of_uncertainty_estimation: Lack of uncertainty estimation
+    feature_leakage: Feature leakage
+    incorrect_spatial_geometric_interpretation: Incorrect spatial-geometric interpretation
+
+    domain_shift: Domain shift
+    incomplete_validation_criteria: Incomplete validation criteria
+    overfitting: Overfitting
+    confabulations: Confabulations
+    confidence_miscalibration: Confidence miscalibration
+    catastrophic_forgetting: Catastrophic forgetting
+
+    loss_of_situational_awareness: Loss of situational awareness
+    sensor_artifacts: Sensor artifacts
+    concept_drift: Concept drift
+    cascading_error_propagation: Cascading error propagation
+
+scale:
+  relations:
+    "=": 0
+    ">": 2
+    ">>": 4
+
+  priorities:
+    low: 1
+    medium: 2
+    high: 3
+    very_high: 4

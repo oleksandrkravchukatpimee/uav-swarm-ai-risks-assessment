@@ -2,7 +2,6 @@ from fractions import Fraction
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
-import yaml
 
 class AHPAnalyzer:
     STAGE_CHILD_KEYS = ("factors",)
@@ -11,6 +10,8 @@ class AHPAnalyzer:
 
     @staticmethod
     def load_hierarchy(yaml_file: str) -> Dict[str, Any]:
+        import yaml
+
         with open(yaml_file, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
 
