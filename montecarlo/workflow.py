@@ -38,6 +38,14 @@ class MonteCarloConfig:
     stop_on_error: bool = False
 
 
+def _build_alias_map(loaded_config: ConfigDefinition) -> Dict[str, str]:
+    aliases: Dict[str, str] = {}
+    aliases.update({str(k): str(v) for k, v in loaded_config.stage_aliases.items()})
+    aliases.update({str(k): str(v) for k, v in loaded_config.factor_aliases.items()})
+    aliases.update({str(k): str(v) for k, v in loaded_config.risk_aliases.items()})
+    return aliases
+
+
 def _ensure_profile_subset(
     profiles: Mapping[str, ProfileDefinition],
     profile_ids: Sequence[str] | None,
@@ -169,10 +177,12 @@ def run_montecarlo(cfg: MonteCarloConfig) -> Dict:
         )
         generated_samples.extend(samples)
 
+    alias_map = _build_alias_map(loaded_config)
     run_results = run_generated_samples(
         samples=generated_samples,
         out_dir=out_dir,
         cr_filter=CRFilterConfig(threshold=cfg.cr_threshold, mode=cfg.cr_mode),
+        id_to_label=alias_map,
         stop_on_error=cfg.stop_on_error,
         dry_run=False,
     )

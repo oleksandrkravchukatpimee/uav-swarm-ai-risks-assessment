@@ -5,7 +5,7 @@ import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Tuple
 
 from montecarlo.generator import GeneratedSample
 
@@ -52,7 +52,11 @@ def evaluate_consistency(local_weights_by_path: Dict[str, Dict[str, Any]], cfg: 
     return not offending, offending, max_cr
 
 
-def run_ahp_for_hierarchy(hierarchy_path: str | Path, analyzer: Any | None = None) -> Dict[str, Any]:
+def run_ahp_for_hierarchy(
+    hierarchy_path: str | Path,
+    analyzer: Any | None = None,
+    id_to_label: Mapping[str, str] | None = None,
+) -> Dict[str, Any]:
     if analyzer is None:
         from ahp_analyzer import AHPAnalyzer
 
@@ -61,7 +65,7 @@ def run_ahp_for_hierarchy(hierarchy_path: str | Path, analyzer: Any | None = Non
         ahp = analyzer
     hierarchy = ahp.load_hierarchy(str(hierarchy_path))
     flat_data = ahp.build_comparison_matrices(hierarchy)
-    local_weights_by_path = ahp.calculate_local_weights_by_path(flat_data)
+    local_weights_by_path = ahp.calculate_local_weights_by_path(flat_data, id_to_label=id_to_label)
     global_weights = ahp.propagate_global_weights(local_weights_by_path)
 
     return {
@@ -75,6 +79,7 @@ def run_generated_samples(
     samples: Iterable[GeneratedSample],
     out_dir: str | Path,
     cr_filter: CRFilterConfig,
+    id_to_label: Mapping[str, str] | None = None,
     stop_on_error: bool = False,
     dry_run: bool = False,
 ) -> List[Dict[str, Any]]:
@@ -113,7 +118,7 @@ def run_generated_samples(
                 from ahp_analyzer import AHPAnalyzer
 
                 analyzer = AHPAnalyzer()
-            run_payload = run_ahp_for_hierarchy(sample.hierarchy_path, analyzer=analyzer)
+            run_payload = run_ahp_for_hierarchy(sample.hierarchy_path, analyzer=analyzer, id_to_label=id_to_label)
             local_weights_by_path = run_payload["local_weights_by_path"]
             global_weights = run_payload["global_weights"]
             accepted, offending_paths, max_cr = evaluate_consistency(local_weights_by_path, cfg=cr_filter)

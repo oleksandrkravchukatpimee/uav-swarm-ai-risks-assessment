@@ -1,5 +1,5 @@
 from fractions import Fraction
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 import numpy as np
 
@@ -55,6 +55,13 @@ class AHPAnalyzer:
     def _set_reciprocal_pair(matrix: np.ndarray, i: int, j: int, val: float) -> None:
         matrix[i][j] = 1 / val
         matrix[j][i] = val
+
+    @staticmethod
+    def _label_id(item_id: str, id_to_label: Mapping[str, str] | None) -> str:
+        item = str(item_id)
+        if id_to_label is None:
+            return item
+        return str(id_to_label.get(item, item))
 
     def _child_keys_for_depth(self, depth: int) -> Tuple[str, ...]:
         if depth == 0:
@@ -181,13 +188,18 @@ class AHPAnalyzer:
         cr = ci / ri if ri else 0.0
         return weights, max_eigval, ci, cr
 
-    def calculate_local_weights_by_path(self, flat_data: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    def calculate_local_weights_by_path(
+        self,
+        flat_data: List[Dict[str, Any]],
+        id_to_label: Mapping[str, str] | None = None,
+    ) -> Dict[str, Dict[str, Any]]:
         local_weights_by_path: Dict[str, Dict[str, Any]] = {}
         for block in flat_data:
             weights, lam_max, ci, cr = self.calculate_ahp(block["matrix"])
-            key_path = " / ".join(block["path"])
+            key_path = " / ".join(self._label_id(path_item, id_to_label) for path_item in block["path"])
+            labeled_items = [self._label_id(item, id_to_label) for item in block["items"]]
             local_weights_by_path[key_path] = {
-                "items": block["items"],
+                "items": labeled_items,
                 "matrix": block["matrix"],
                 "weights": weights,
                 "lam_max": lam_max,
