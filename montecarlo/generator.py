@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Tuple
 
 from montecarlo.biases import ProfileBiasConfig
-from montecarlo.profiles import ProfileDefinition
+from montecarlo.profiles import ProfileDefinition, build_signed_pairwise_values
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,10 +32,7 @@ class GeneratedSample:
 
 
 def clamp_scale_value(value: int) -> int:
-    clamped = max(-9, min(9, int(value)))
-    if clamped == 0:
-        return 1 if value >= 0 else -1
-    return clamped
+    return max(-9, min(9, int(value)))
 
 
 def _to_scale_int(value: Any) -> int:
@@ -46,8 +43,6 @@ def _to_scale_int(value: Any) -> int:
         raw = float(value)
 
     rounded = int(round(raw))
-    if rounded == 0:
-        rounded = 1 if raw >= 0 else -1
     return clamp_scale_value(rounded)
 
 
@@ -115,6 +110,28 @@ def _iter_comparison_groups(hierarchy: Dict[str, Any]) -> Iterable[Tuple[str, Li
                 yield "risk", [stage_name, factor_name], risks
 
 
+def _normalize_empty_risk_nodes(hierarchy: Dict[str, Any]) -> None:
+    """
+    YAML bare keys under risks are parsed as None. Normalize them to empty mappings
+    so generated files keep explicit '{}' instead of 'null'.
+    """
+    for stage_node in hierarchy.values():
+        if not isinstance(stage_node, dict):
+            continue
+        factors = stage_node.get("factors")
+        if not isinstance(factors, dict):
+            continue
+        for factor_node in factors.values():
+            if not isinstance(factor_node, dict):
+                continue
+            risks = factor_node.get("risks")
+            if not isinstance(risks, dict):
+                continue
+            for risk_id, risk_node in list(risks.items()):
+                if risk_node is None:
+                    risks[risk_id] = {}
+
+
 def _profile_seed_offset(profile_id: str) -> int:
     return sum((idx + 1) * ord(ch) for idx, ch in enumerate(profile_id))
 
@@ -125,6 +142,15 @@ def _sigma_for_scope(scope: str, variability: VariabilityConfig) -> float:
     if scope == "factor":
         return variability.factor_sigma
     return variability.risk_sigma
+
+
+def _has_explicit_profile_rule(scope: str, group_path: List[str], profile: ProfileDefinition) -> bool:
+    if scope == "stage":
+        return True
+    if scope == "factor":
+        return group_path[0] in profile.factor_scores_by_stage
+    path_key = " / ".join(group_path)
+    return path_key in profile.risk_scores_by_path
 
 
 def _score_map_for_group(
@@ -158,12 +184,16 @@ def generate_profile_hierarchy(
     sample_seed: int,
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     hierarchy = copy.deepcopy(base_hierarchy)
+    _normalize_empty_risk_nodes(hierarchy)
     rng = random.Random(sample_seed)
     perturbations: List[Dict[str, Any]] = []
 
     for scope, group_path, group_dict in _iter_comparison_groups(hierarchy):
         group_names = [name for name in group_dict.keys()]
         score_map = _score_map_for_group(scope, group_path, group_names, profile, bias_cfg)
+        pairwise_map, conversion_trace = build_signed_pairwise_values(score_map, group_names)
+        explicit_rule = _has_explicit_profile_rule(scope, group_path, profile)
+        has_non_zero_signal = any(int(v) != 0 for v in score_map.values())
         sigma = _sigma_for_scope(scope, variability)
 
         for current_name, current_node in group_dict.items():
@@ -178,9 +208,13 @@ def generate_profile_hierarchy(
                     continue
 
                 old_value = _to_scale_int(raw_value)
-                deterministic_delta = int(score_map.get(target_name, 0) - score_map.get(current_name, 0))
+                if explicit_rule or has_non_zero_signal:
+                    pre_mc_value = int(pairwise_map[(current_name, target_name)])
+                else:
+                    pre_mc_value = old_value
+                deterministic_delta = int(pre_mc_value - old_value)
                 noise = int(round(rng.gauss(0.0, sigma))) if sigma > 0 else 0
-                new_value = clamp_scale_value(old_value + deterministic_delta + noise)
+                new_value = clamp_scale_value(pre_mc_value + noise)
 
                 _set_compare_value(compare_obj, token, new_value)
                 perturbations.append({
@@ -189,6 +223,9 @@ def generate_profile_hierarchy(
                     "current": current_name,
                     "target": target_name,
                     "old_value": old_value,
+                    "parsed_profile_order": conversion_trace["parsed_profile_order"],
+                    "relative_ranks": conversion_trace["relative_ranks"],
+                    "pre_montecarlo_value": pre_mc_value,
                     "deterministic_delta": deterministic_delta,
                     "random_noise": noise,
                     "new_value": new_value,

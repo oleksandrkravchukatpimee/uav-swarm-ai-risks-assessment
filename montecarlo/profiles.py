@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 
 VALID_STAGE_IDS = {"KS", "KA", "TR", "OP"}
@@ -123,15 +123,78 @@ def parse_relation_expression(
     return scores_by_code
 
 
-def stage_pairwise_deltas(stage_scores: Mapping[str, int]) -> Dict[Tuple[str, str], int]:
-    deltas: Dict[Tuple[str, str], int] = {}
-    stages = list(stage_scores.keys())
-    for current in stages:
-        for target in stages:
+def signed_preference_delta(current_score: int, target_score: int) -> int:
+    """
+    Convert profile scores into YAML compare-sign direction.
+
+    Authoritative convention for:
+      A:
+        compare:
+          B: x
+
+    - x > 0 => B is more important than A
+    - x < 0 => A is more important than B
+    - x = 0 => equal
+
+    Higher score means higher profile priority, therefore:
+      delta = target_score - current_score
+    """
+    return int(target_score - current_score)
+
+
+def build_signed_pairwise_values(
+    score_map: Mapping[str, int],
+    names: Sequence[str],
+    max_abs_value: int = 8,
+) -> Tuple[Dict[Tuple[str, str], int], Dict[str, Any]]:
+    """
+    Build coherent pairwise signed values from full group scores.
+
+    The conversion uses the full score span inside the group, so farther-apart
+    alternatives get stronger signed values while equal-score alternatives stay
+    near zero.
+    """
+    ordered_names = [str(name) for name in names]
+    scores = {name: int(score_map.get(name, 0)) for name in ordered_names}
+
+    unique_scores_desc = sorted(set(scores.values()), reverse=True)
+    parsed_order = [[name for name in ordered_names if scores[name] == value] for value in unique_scores_desc]
+    relative_ranks = {
+        name: rank_idx
+        for rank_idx, group in enumerate(parsed_order)
+        for name in group
+    }
+
+    if unique_scores_desc:
+        score_span = int(unique_scores_desc[0] - unique_scores_desc[-1])
+    else:
+        score_span = 0
+
+    pairwise: Dict[Tuple[str, str], int] = {}
+    for current in ordered_names:
+        for target in ordered_names:
             if current == target:
                 continue
-            deltas[(current, target)] = int(stage_scores[target] - stage_scores[current])
-    return deltas
+
+            raw_delta = signed_preference_delta(scores[current], scores[target])
+            if score_span <= 0:
+                scaled = 0
+            else:
+                scaled = int(round((raw_delta / float(score_span)) * float(max_abs_value)))
+            pairwise[(current, target)] = max(-max_abs_value, min(max_abs_value, scaled))
+
+    trace = {
+        "parsed_profile_order": parsed_order,
+        "relative_ranks": relative_ranks,
+        "score_span": score_span,
+        "pre_montecarlo_pairwise": {f"{c} -> {t}": v for (c, t), v in pairwise.items()},
+    }
+    return pairwise, trace
+
+
+def stage_pairwise_deltas(stage_scores: Mapping[str, int]) -> Dict[Tuple[str, str], int]:
+    pairwise, _ = build_signed_pairwise_values(stage_scores, list(stage_scores.keys()))
+    return pairwise
 
 
 def load_config(config_path: str | Path) -> ConfigDefinition:

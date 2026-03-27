@@ -92,8 +92,8 @@ P1:
 
     def test_stage_pairwise_deltas(self):
         deltas = stage_pairwise_deltas({"A": 0, "B": -2, "C": -4})
-        self.assertEqual(deltas[("A", "B")], -2)
-        self.assertEqual(deltas[("C", "A")], 4)
+        self.assertEqual(deltas[("A", "B")], -4)
+        self.assertEqual(deltas[("C", "A")], 8)
 
     def test_load_config_and_profiles(self):
         try:

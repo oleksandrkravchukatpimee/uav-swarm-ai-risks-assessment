@@ -47,6 +47,8 @@ class AHPAnalyzer:
 
     @staticmethod
     def _normalize_signed_value(signed_val: float) -> float:
+        if signed_val == 0:
+            return 1.0
         return signed_val if signed_val > 0 else -1 / signed_val
 
     @staticmethod
