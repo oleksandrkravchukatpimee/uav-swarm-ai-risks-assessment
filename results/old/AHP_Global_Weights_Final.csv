@@ -1,0 +1,21 @@
+Path,Global Weight
+Knowledge selection / Human / Data representativeness,0.030292490185657644
+Knowledge selection / Human / Dataset bias,0.030292490185657633
+Knowledge selection / Human / Temporal bias,0.012017164497212603
+Knowledge selection / Human / Scale mismatch,0.012017164497212605
+Knowledge selection / Human / Limited scene diversity,0.016263188312809828
+Knowledge analysis / Human / Annotation errors,0.018821855903870848
+Knowledge analysis / Human / Inadequate model architecture,0.09933483067217555
+Knowledge analysis / Human / Lack of uncertainty estimation,0.008321471266698277
+Knowledge analysis / Technological / Feature leakage,0.016863754379032626
+Knowledge analysis / Technological / Incorrect spatial-geometric interpretation,0.008431877189516311
+AGPM Training / Human / Domain shift,0.019036241642028197
+AGPM Training / Human / Incomplete validation criteria,0.03807248328405638
+AGPM Training / Technological / Overfitting,0.016644216829218034
+AGPM Training / Technological / Confabulations,0.048180648288783816
+AGPM Training / Technological / Confidence miscalibration,0.010206700223149708
+AGPM Training / Technological / Catastrophic forgetting,0.09629460943710216
+Model operation / Human / Loss of situational awareness,0.06486360165072722
+Model operation / Technological / Sensor artifacts,0.10240331344678265
+Model operation / Technological / Concept drift,0.045701434812579204
+Model operation / Technological / Cascading error propagation,0.30594046329572866

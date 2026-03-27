@@ -1,0 +1,34 @@
+@startmindmap
+* AHP Risk Hierarchy
+** Knowledge selection
+*** Human
+**** Data representativeness (0.0303)
+**** Dataset bias (0.0303)
+**** Temporal bias (0.0120)
+**** Scale mismatch (0.0120)
+**** Limited scene diversity (0.0163)
+** Knowledge analysis
+*** Human
+**** Annotation errors (0.0188)
+**** Inadequate model architecture (0.0993)
+**** Lack of uncertainty estimation (0.0083)
+*** Technological
+**** Feature leakage (0.0169)
+**** Incorrect spatial-geometric interpretation (0.0084)
+** AGPM Training
+*** Human
+**** Domain shift (0.0190)
+**** Incomplete validation criteria (0.0381)
+*** Technological
+**** Overfitting (0.0166)
+**** Confabulations (0.0482)
+**** Confidence miscalibration (0.0102)
+**** Catastrophic forgetting (0.0963)
+** Model operation
+*** Human
+**** Loss of situational awareness (0.0649)
+*** Technological
+**** Sensor artifacts (0.1024)
+**** Concept drift (0.0457)
+**** Cascading error propagation (0.3059)
+@endmindmap

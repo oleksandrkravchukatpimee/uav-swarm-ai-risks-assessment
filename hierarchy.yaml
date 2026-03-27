@@ -1,102 +1,111 @@
-"Knowledge selection":
-  items:
-    "Human":
-      items:
-        "Data representativeness":
-        "Dataset bias":
-          compare:
-            - [ "Data representativeness", "1" ]
-        "Temporal bias":
-          compare:
-            # "Data representativeness" more important than "Temporal bias"
-            - [ "Data representativeness", "2" ]
-            - [ "Dataset bias", "2" ]
-        "Scale mismatch":
-          compare:
-            - [ "Data representativeness", "2" ]
-            - [ "Dataset bias", "2" ]
-            - [ "Temporal bias", "1" ]
-        "Limited scene diversity":
-          compare:
-            - ["Data representativeness", "3"]
-            - ["Dataset bias", "3"]
-            - ["Temporal bias", "-2"]
-            - ["Scale mismatch", "-2"]
+# Document supports simple and clear structure of risk hierarchy
+#
+# "Stage X":
+#  compare:
+#    "Stage Y": Fyx       # Fyx > 0 means "Stage Y" is more important than "Stage X"
+#  factors:
 #    "Technological":
 #      compare:
-#        - ["Human", 1]
-#      items: # empty
+#        "Human": Fht     # Fht < 0 means "Human" is less important than "Technological"
+#      risks: # empty
+#
+# Fab - impoprtance factor, i.e. how risk A is more important than risk B
+# when Fab = 0, risk A equals to risk B
+# when Fab < 0, risk A is less important than risk B
+# when Fab > 0, risk A is more important than risk B
+"Knowledge selection":
+  factors:
+    "Human":
+      risks:
+        "Data representativeness": {}
+        "Dataset bias":
+          compare:
+            "Data representativeness": 1
+        "Temporal bias":
+          compare:
+            "Data representativeness": 2
+            "Dataset bias": 2
+        "Scale mismatch":
+          compare:
+            "Data representativeness": 2
+            "Dataset bias": 2
+            "Temporal bias": 1
+        "Limited scene diversity":
+          compare:
+            "Data representativeness": 3
+            "Dataset bias": 3
+            "Temporal bias": -2
+            "Scale mismatch": -2
 "Knowledge analysis":
   compare:
-    # "Knowledge selection" less important than "Knowledge analysis"
-    - ["Knowledge selection", "-2"]
-  items:
+    "Knowledge selection": -2
+  factors:
     "Human":
-      items:
-        "Annotation errors":
+      risks:
+        "Annotation errors": {}
         "Inadequate model architecture":
           compare:
-            - ["Annotation errors", "-7"]
+            "Annotation errors": -7
         "Lack of uncertainty estimation":
           compare:
-            - ["Annotation errors", "3"]
-            - ["Inadequate model architecture", "9"]
+            "Annotation errors": 3
+            "Inadequate model architecture": 9
     "Technological":
       compare:
-        - ["Human", "5"]
-      items:
+        "Human": 5
+      risks:
         "Feature leakage":
         "Incorrect spatial-geometric interpretation":
           compare:
-            - ["Feature leakage", "2"]
+            "Feature leakage": 2
 
 "AGPM Training":
   compare:
-    - ["Knowledge selection", "-3"]
-    - ["Knowledge analysis", "-2"]
-  items:
+    "Knowledge selection": -3
+    "Knowledge analysis": -2
+  factors:
     "Human":
-      items:
+      risks:
         "Domain shift":
         "Incomplete validation criteria":
           compare:
-            - ["Domain shift", "-2"]
+            "Domain shift": -2
     "Technological":
       compare:
-        - [ "Human", "-3"]
-      items:
+        "Human": -3
+      risks:
         "Overfitting":
         "Confabulations":
           compare:
-            - ["Overfitting", "-4"]
+            "Overfitting": -4
         "Confidence miscalibration":
           compare:
-            - ["Overfitting", "2"]
-            - ["Confabulations", "5"]
+            "Overfitting": 2
+            "Confabulations": 5
         "Catastrophic forgetting":
           compare:
-            - ["Overfitting", "-5"]
-            - ["Confabulations", "-3"]
-            - ["Confidence miscalibration", "-7"]
+            "Overfitting": -5
+            "Confabulations": -3
+            "Confidence miscalibration": -7
 
 "Model operation":
   compare:
-    - ["Knowledge selection", "-3"]
-    - ["Knowledge analysis", "-3"]
-    - ["AGPM Training", "-4"]
-  items:
+    "Knowledge selection": -3
+    "Knowledge analysis": -3
+    "AGPM Training": -4
+  factors:
     "Human":
-      items:
+      risks:
         "Loss of situational awareness":
     "Technological":
       compare:
-        - ["Human", "-7"]
-      items:
-        "Sensor artifacts":
+        "Human": -7
+      risks:
+        "Sensor artifacts": {}
         "Concept drift":
           compare:
-            - [ "Sensor artifacts", "3" ]
+            "Sensor artifacts": 3
         "Cascading error propagation":
           compare:
-            - [ "Sensor artifacts", "-4" ]
-            - [ "Concept drift", "-5" ]
+            "Sensor artifacts": -4
+            "Concept drift": -5
