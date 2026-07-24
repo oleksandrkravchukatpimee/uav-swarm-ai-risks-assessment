@@ -9,7 +9,7 @@
 #        H: Fht     # Fht < 0 means H is less important than T
 #      risks: # empty
 #
-# Fab - impoprtance factor, i.e. how risk A is more important than risk B
+# Fab - importance factor, i.e. how risk A is more important than risk B
 # when Fab = 0, risk A equals to risk B
 # when Fab < 0, risk A is less important than risk B
 # when Fab > 0, risk A is more important than risk B

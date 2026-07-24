@@ -75,6 +75,7 @@ Modes:
 ## CLI
 Run:
 
+Core taxonomy:
 ```bash
 python -m ahp_cli montecarlo \
   --base in/hierarchy.yaml \
@@ -83,6 +84,20 @@ python -m ahp_cli montecarlo \
   --samples 200 \
   --seed 42 \
   --out out/montecarlo \
+  --variability 1.0 \
+  --cr-mode any \
+  --cr-threshold 0.1
+```
+
+Expanded taxonomy:
+```bash
+python -m ahp_cli montecarlo \
+  --base in/hierarchy.expanded.yaml \
+  --config in/config.expanded.yaml \
+  --profiles in/profiles.expanded.yaml \
+  --samples 200 \
+  --seed 42 \
+  --out out/montecarlo_expanded \
   --variability 1.0 \
   --cr-mode any \
   --cr-threshold 0.1
