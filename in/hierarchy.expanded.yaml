@@ -183,49 +183,54 @@ KA:
             ood_domain_definition_error: 0
             misdiagnosis_error_causes: 0
             swarm_in_the_loop_omission: 0
+        inadequate_model_architecture:
+          compare:
+            annotation_errors: 0
+            task_formulation_mismatch: 0
+            incomplete_validation_criteria_ka: 0
+            assumption_mismatch_sensors_comms: 0
+            ood_domain_definition_error: 0
+            misdiagnosis_error_causes: 0
+            swarm_in_the_loop_omission: 0
+            hsi_operator_loop_omission: 0
+        lack_of_uncertainty_estimation:
+          compare:
+            annotation_errors: 0
+            task_formulation_mismatch: 0
+            incomplete_validation_criteria_ka: 0
+            assumption_mismatch_sensors_comms: 0
+            ood_domain_definition_error: 0
+            misdiagnosis_error_causes: 0
+            swarm_in_the_loop_omission: 0
+            hsi_operator_loop_omission: 0
+            inadequate_model_architecture: 0
     T:
       compare:
         H: 0
       risks:
-        inadequate_model_architecture: {}
-        lack_of_uncertainty_estimation:
-          compare:
-            inadequate_model_architecture: 0
-        feature_leakage:
-          compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
+
+        reliance_on_spurious_features: {}
         incorrect_spatial_geometric_interpretation:
           compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
-            feature_leakage: 0
+            reliance_on_spurious_features: 0
         frame_mismatch:
           compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
-            feature_leakage: 0
+            reliance_on_spurious_features: 0
             incorrect_spatial_geometric_interpretation: 0
         representation_mismatch:
           compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
-            feature_leakage: 0
+            reliance_on_spurious_features: 0
             incorrect_spatial_geometric_interpretation: 0
             frame_mismatch: 0
         correlated_errors_graph_omission:
           compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
-            feature_leakage: 0
+            reliance_on_spurious_features: 0
             incorrect_spatial_geometric_interpretation: 0
             frame_mismatch: 0
             representation_mismatch: 0
         pseudo_quantification:
           compare:
-            inadequate_model_architecture: 0
-            lack_of_uncertainty_estimation: 0
-            feature_leakage: 0
+            reliance_on_spurious_features: 0
             incorrect_spatial_geometric_interpretation: 0
             frame_mismatch: 0
             representation_mismatch: 0

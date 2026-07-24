@@ -1,0 +1,551 @@
+{
+  "config": {
+    "base_yaml": "in/hierarchy.expanded.yaml",
+    "config_yaml": "in/config.expanded.yaml",
+    "profiles_yaml": "in/profiles.expanded.yaml",
+    "samples_per_profile": 200,
+    "out_dir": "results/montecarlo_expanded",
+    "seed": 42,
+    "variability_strength": 1.0,
+    "profile_ids": null,
+    "cr_threshold": 0.1,
+    "cr_mode": "any",
+    "dry_run": false,
+    "stop_on_error": false
+  },
+  "schema": {
+    "version": 1,
+    "aliases": {
+      "stages": {
+        "KS": "Knowledge selection",
+        "KA": "Knowledge analysis",
+        "TR": "Model training",
+        "OP": "Model operation"
+      },
+      "factors": {
+        "H": "Human",
+        "T": "Technological"
+      },
+      "risks": {
+        "representativeness": "Data representativeness / representativeness gap",
+        "dataset_bias": "Dataset bias / spatial bias",
+        "temporal_bias": "Temporal bias / seasonality",
+        "scale_mismatch": "Scale mismatch",
+        "limited_scene_diversity": "Limited scene diversity",
+        "missing_operational_scenarios": "Missing operational scenarios",
+        "label_metadata_leakage": "Label/metadata leakage",
+        "data_contamination_train_test_leakage": "Data contamination / train-test leakage",
+        "data_to_ops_mismatch": "Data-to-ops mismatch",
+        "operator_supervision_mismatch": "Operator/supervision mismatch",
+        "sensor_heterogeneity": "Sensor heterogeneity",
+        "compression_artifacts_transformations": "Compression artifacts and data transformations",
+        "georeferencing_sensor_calibration_errors": "Georeferencing and sensor calibration errors",
+        "latency_refresh_rate_mismatch": "Latency/refresh-rate mismatch",
+        "correlated_inter_agent_errors_ks": "Correlated inter-agent errors not represented in data",
+        "class_event_imbalance": "Class/event imbalance",
+        "pipeline_mismatch": "Data format / pipeline mismatch",
+        "weather_smoke_snow_degradation_gap": "Weather/smoke/snow degradation coverage gap",
+        "ood_unknown_unknowns": "OOD / unknown unknowns",
+        "c2_mode_mismatch": "C2-mode mismatch",
+        "annotation_errors": "Annotation errors",
+        "task_formulation_mismatch": "Task formulation mismatch",
+        "incomplete_validation_criteria_ka": "Incomplete or inadequate validation criteria",
+        "assumption_mismatch_sensors_comms": "Assumption mismatch about sensors and communication",
+        "ood_domain_definition_error": "OOD / working-domain definition error",
+        "misdiagnosis_error_causes": "Misdiagnosis of error causes",
+        "swarm_in_the_loop_omission": "Swarm-in-the-loop omission",
+        "hsi_operator_loop_omission": "HSI / operator-loop omission",
+        "inadequate_model_architecture": "Inappropriate model architecture",
+        "lack_of_uncertainty_estimation": "Lack of uncertainty estimation",
+        "reliance_on_spurious_features": "Reliance on spurious features",
+        "incorrect_spatial_geometric_interpretation": "Incorrect spatial-geometric interpretation",
+        "frame_mismatch": "Spatial frame / map mismatch",
+        "representation_mismatch": "Representation mismatch for swarm needs",
+        "correlated_errors_graph_omission": "Correlated errors x interaction graph omission",
+        "pseudo_quantification": "Pseudo-quantification risk",
+        "domain_shift": "Domain shift underestimation",
+        "incomplete_validation_criteria": "Incomplete validation criteria",
+        "data_leakage_split_overestimation": "Overestimation due to data leakage / wrong splits",
+        "overfitting_regularization_control_gap": "Insufficient overfitting / regularization control",
+        "reproducibility_failure": "Reproducibility failure",
+        "continual_online_learning_misuse": "Wrong continual/online learning approach",
+        "overfitting": "Overfitting",
+        "confabulations": "Confabulations",
+        "confidence_miscalibration": "Confidence miscalibration",
+        "catastrophic_forgetting": "Catastrophic forgetting",
+        "domain_shift_technological": "Domain shift as technological robustness failure",
+        "metric_gaming": "Metric gaming",
+        "noise_blur_compression_fragility": "Noise/blur/compression fragility",
+        "correlated_error_structure": "Correlated error structure omission",
+        "latency_compute_budget_breach": "Latency/compute budget breach",
+        "training_instability": "Training instability",
+        "preprocessing_augmentation_pipeline_defects": "Preprocessing and augmentation pipeline defects",
+        "selective_prediction_failure": "Selective prediction / refusal failure",
+        "loss_of_situational_awareness": "Loss of situational awareness",
+        "policy_misconfiguration": "Policy misconfiguration",
+        "operator_override_error": "Incorrect operator override",
+        "ops_gaps": "OPS gaps",
+        "mission_drift": "Mission drift",
+        "sensor_artifacts": "Sensor artifacts",
+        "concept_drift": "Concept drift",
+        "cascading_error_propagation": "Cascading error propagation",
+        "correlated_perception_errors": "Correlated perception errors",
+        "communication_loss_fragmentation": "Communication loss / swarm fragmentation",
+        "dynamic_topology": "Dynamic topology",
+        "compute_overload": "On-board compute overload",
+        "model_version_skew": "Model version skew",
+        "map_inconsistency": "Map inconsistency",
+        "security_robustness": "Security robustness / spoofing",
+        "fallback_failure": "Fallback failure / controlled degradation failure",
+        "collective_robustness_loss": "Collective robustness loss"
+      }
+    },
+    "scale": {
+      "relations": {
+        "=": 0,
+        ">": 2,
+        ">>": 4
+      },
+      "priorities": {
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very_high": 4
+      }
+    }
+  },
+  "profiles": {
+    "P1": {
+      "name": "AI/ML-heavy",
+      "description": "Focus on uncertainty, calibration, confabulations, and model-related risks.",
+      "stage_expression": "KA = TR > OP > KS",
+      "parsed_factor_rules": {
+        "KS": "H > T",
+        "KA": "T > H",
+        "TR": "T > H",
+        "OP": "T > H"
+      },
+      "parsed_risk_profile": {
+        "KS": {
+          "H": {
+            "representativeness": 3,
+            "dataset_bias": 3,
+            "temporal_bias": 2,
+            "scale_mismatch": 2,
+            "limited_scene_diversity": 2,
+            "missing_operational_scenarios": 3,
+            "label_metadata_leakage": 2,
+            "data_contamination_train_test_leakage": 2,
+            "data_to_ops_mismatch": 2,
+            "operator_supervision_mismatch": 2
+          },
+          "T": {
+            "sensor_heterogeneity": 3,
+            "compression_artifacts_transformations": 2,
+            "georeferencing_sensor_calibration_errors": 2,
+            "latency_refresh_rate_mismatch": 2,
+            "correlated_inter_agent_errors_ks": 2,
+            "class_event_imbalance": 2,
+            "pipeline_mismatch": 2,
+            "weather_smoke_snow_degradation_gap": 3,
+            "ood_unknown_unknowns": 3,
+            "c2_mode_mismatch": 2
+          }
+        },
+        "KA": {
+          "H": {
+            "annotation_errors": 3,
+            "task_formulation_mismatch": 3,
+            "incomplete_validation_criteria_ka": 2,
+            "assumption_mismatch_sensors_comms": 2,
+            "ood_domain_definition_error": 2,
+            "misdiagnosis_error_causes": 2,
+            "swarm_in_the_loop_omission": 2,
+            "hsi_operator_loop_omission": 2,
+            "inadequate_model_architecture": 3,
+            "lack_of_uncertainty_estimation": 4
+          },
+          "T": {
+            "reliance_on_spurious_features": 3,
+            "incorrect_spatial_geometric_interpretation": 4,
+            "frame_mismatch": 3,
+            "representation_mismatch": 3,
+            "correlated_errors_graph_omission": 3,
+            "pseudo_quantification": 4
+          }
+        },
+        "TR": {
+          "H": {
+            "domain_shift": 3,
+            "incomplete_validation_criteria": 2,
+            "data_leakage_split_overestimation": 3,
+            "overfitting_regularization_control_gap": 2,
+            "reproducibility_failure": 2,
+            "continual_online_learning_misuse": 2
+          },
+          "T": {
+            "overfitting": 3,
+            "confabulations": 4,
+            "confidence_miscalibration": 4,
+            "catastrophic_forgetting": 1,
+            "domain_shift_technological": 3,
+            "metric_gaming": 3,
+            "noise_blur_compression_fragility": 3,
+            "correlated_error_structure": 3,
+            "latency_compute_budget_breach": 3,
+            "training_instability": 3,
+            "preprocessing_augmentation_pipeline_defects": 3,
+            "selective_prediction_failure": 3
+          }
+        },
+        "OP": {
+          "H": {
+            "loss_of_situational_awareness": 3,
+            "policy_misconfiguration": 2,
+            "operator_override_error": 2,
+            "ops_gaps": 2,
+            "mission_drift": 2
+          },
+          "T": {
+            "sensor_artifacts": 3,
+            "concept_drift": 3,
+            "cascading_error_propagation": 2,
+            "correlated_perception_errors": 2,
+            "communication_loss_fragmentation": 2,
+            "dynamic_topology": 2,
+            "compute_overload": 2,
+            "model_version_skew": 2,
+            "map_inconsistency": 3,
+            "security_robustness": 3,
+            "fallback_failure": 2,
+            "collective_robustness_loss": 2
+          }
+        }
+      }
+    },
+    "P2": {
+      "name": "Swarm/Ops-heavy",
+      "description": "Focus on operation-stage risks, coordination failures, and cascading effects in the swarm.",
+      "stage_expression": "OP >> TR > KA > KS",
+      "parsed_factor_rules": {
+        "KS": "H > T",
+        "KA": "T > H",
+        "TR": "T > H",
+        "OP": "T >> H"
+      },
+      "parsed_risk_profile": {
+        "KS": {
+          "H": {
+            "representativeness": 3,
+            "dataset_bias": 3,
+            "temporal_bias": 1,
+            "scale_mismatch": 1,
+            "limited_scene_diversity": 1,
+            "missing_operational_scenarios": 3,
+            "label_metadata_leakage": 1,
+            "data_contamination_train_test_leakage": 1,
+            "data_to_ops_mismatch": 1,
+            "operator_supervision_mismatch": 1
+          },
+          "T": {
+            "sensor_heterogeneity": 3,
+            "compression_artifacts_transformations": 1,
+            "georeferencing_sensor_calibration_errors": 1,
+            "latency_refresh_rate_mismatch": 1,
+            "correlated_inter_agent_errors_ks": 4,
+            "class_event_imbalance": 1,
+            "pipeline_mismatch": 1,
+            "weather_smoke_snow_degradation_gap": 3,
+            "ood_unknown_unknowns": 3,
+            "c2_mode_mismatch": 1
+          }
+        },
+        "KA": {
+          "H": {
+            "annotation_errors": 3,
+            "task_formulation_mismatch": 3,
+            "incomplete_validation_criteria_ka": 2,
+            "assumption_mismatch_sensors_comms": 2,
+            "ood_domain_definition_error": 2,
+            "misdiagnosis_error_causes": 2,
+            "swarm_in_the_loop_omission": 2,
+            "hsi_operator_loop_omission": 2,
+            "inadequate_model_architecture": 3,
+            "lack_of_uncertainty_estimation": 2
+          },
+          "T": {
+            "reliance_on_spurious_features": 3,
+            "incorrect_spatial_geometric_interpretation": 2,
+            "frame_mismatch": 2,
+            "representation_mismatch": 2,
+            "correlated_errors_graph_omission": 4,
+            "pseudo_quantification": 2
+          }
+        },
+        "TR": {
+          "H": {
+            "domain_shift": 3,
+            "incomplete_validation_criteria": 2,
+            "data_leakage_split_overestimation": 3,
+            "overfitting_regularization_control_gap": 2,
+            "reproducibility_failure": 2,
+            "continual_online_learning_misuse": 2
+          },
+          "T": {
+            "overfitting": 3,
+            "confabulations": 2,
+            "confidence_miscalibration": 2,
+            "catastrophic_forgetting": 1,
+            "domain_shift_technological": 3,
+            "metric_gaming": 2,
+            "noise_blur_compression_fragility": 3,
+            "correlated_error_structure": 4,
+            "latency_compute_budget_breach": 2,
+            "training_instability": 2,
+            "preprocessing_augmentation_pipeline_defects": 2,
+            "selective_prediction_failure": 2
+          }
+        },
+        "OP": {
+          "H": {
+            "loss_of_situational_awareness": 3,
+            "policy_misconfiguration": 2,
+            "operator_override_error": 2,
+            "ops_gaps": 2,
+            "mission_drift": 2
+          },
+          "T": {
+            "sensor_artifacts": 3,
+            "concept_drift": 3,
+            "cascading_error_propagation": 4,
+            "correlated_perception_errors": 4,
+            "communication_loss_fragmentation": 4,
+            "dynamic_topology": 4,
+            "compute_overload": 3,
+            "model_version_skew": 3,
+            "map_inconsistency": 3,
+            "security_robustness": 3,
+            "fallback_failure": 3,
+            "collective_robustness_loss": 4
+          }
+        }
+      }
+    },
+    "P3": {
+      "name": "Balanced",
+      "description": "Balanced profile with moderate priorities across the lifecycle and risk groups.",
+      "stage_expression": "OP > TR = KA > KS",
+      "parsed_factor_rules": {
+        "KS": "H = T",
+        "KA": "T = H",
+        "TR": "T = H",
+        "OP": "T > H"
+      },
+      "parsed_risk_profile": {
+        "KS": {
+          "H": {
+            "representativeness": 3,
+            "dataset_bias": 3,
+            "temporal_bias": 2,
+            "scale_mismatch": 2,
+            "limited_scene_diversity": 2,
+            "missing_operational_scenarios": 3,
+            "label_metadata_leakage": 2,
+            "data_contamination_train_test_leakage": 2,
+            "data_to_ops_mismatch": 2,
+            "operator_supervision_mismatch": 2
+          },
+          "T": {
+            "sensor_heterogeneity": 3,
+            "compression_artifacts_transformations": 2,
+            "georeferencing_sensor_calibration_errors": 2,
+            "latency_refresh_rate_mismatch": 2,
+            "correlated_inter_agent_errors_ks": 2,
+            "class_event_imbalance": 2,
+            "pipeline_mismatch": 2,
+            "weather_smoke_snow_degradation_gap": 3,
+            "ood_unknown_unknowns": 3,
+            "c2_mode_mismatch": 2
+          }
+        },
+        "KA": {
+          "H": {
+            "annotation_errors": 3,
+            "task_formulation_mismatch": 3,
+            "incomplete_validation_criteria_ka": 2,
+            "assumption_mismatch_sensors_comms": 2,
+            "ood_domain_definition_error": 2,
+            "misdiagnosis_error_causes": 2,
+            "swarm_in_the_loop_omission": 2,
+            "hsi_operator_loop_omission": 2,
+            "inadequate_model_architecture": 3,
+            "lack_of_uncertainty_estimation": 2
+          },
+          "T": {
+            "reliance_on_spurious_features": 3,
+            "incorrect_spatial_geometric_interpretation": 4,
+            "frame_mismatch": 2,
+            "representation_mismatch": 2,
+            "correlated_errors_graph_omission": 2,
+            "pseudo_quantification": 2
+          }
+        },
+        "TR": {
+          "H": {
+            "domain_shift": 3,
+            "incomplete_validation_criteria": 2,
+            "data_leakage_split_overestimation": 3,
+            "overfitting_regularization_control_gap": 2,
+            "reproducibility_failure": 2,
+            "continual_online_learning_misuse": 2
+          },
+          "T": {
+            "overfitting": 3,
+            "confabulations": 2,
+            "confidence_miscalibration": 2,
+            "catastrophic_forgetting": 1,
+            "domain_shift_technological": 3,
+            "metric_gaming": 2,
+            "noise_blur_compression_fragility": 3,
+            "correlated_error_structure": 2,
+            "latency_compute_budget_breach": 2,
+            "training_instability": 2,
+            "preprocessing_augmentation_pipeline_defects": 2,
+            "selective_prediction_failure": 2
+          }
+        },
+        "OP": {
+          "H": {
+            "loss_of_situational_awareness": 3,
+            "policy_misconfiguration": 2,
+            "operator_override_error": 2,
+            "ops_gaps": 2,
+            "mission_drift": 2
+          },
+          "T": {
+            "sensor_artifacts": 3,
+            "concept_drift": 3,
+            "cascading_error_propagation": 4,
+            "correlated_perception_errors": 2,
+            "communication_loss_fragmentation": 2,
+            "dynamic_topology": 2,
+            "compute_overload": 2,
+            "model_version_skew": 2,
+            "map_inconsistency": 3,
+            "security_robustness": 3,
+            "fallback_failure": 2,
+            "collective_robustness_loss": 2
+          }
+        }
+      }
+    },
+    "P4": {
+      "name": "Safety/Validation-heavy",
+      "description": "Focus on uncertainty handling, validation quality, safety constraints, and fallback behavior.",
+      "stage_expression": "OP = TR = KA > KS",
+      "parsed_factor_rules": {
+        "KS": "H = T",
+        "KA": "T > H",
+        "TR": "T > H",
+        "OP": "T = H"
+      },
+      "parsed_risk_profile": {
+        "KS": {
+          "H": {
+            "representativeness": 3,
+            "dataset_bias": 3,
+            "temporal_bias": 2,
+            "scale_mismatch": 2,
+            "limited_scene_diversity": 2,
+            "missing_operational_scenarios": 3,
+            "label_metadata_leakage": 2,
+            "data_contamination_train_test_leakage": 2,
+            "data_to_ops_mismatch": 2,
+            "operator_supervision_mismatch": 3
+          },
+          "T": {
+            "sensor_heterogeneity": 3,
+            "compression_artifacts_transformations": 2,
+            "georeferencing_sensor_calibration_errors": 2,
+            "latency_refresh_rate_mismatch": 2,
+            "correlated_inter_agent_errors_ks": 2,
+            "class_event_imbalance": 2,
+            "pipeline_mismatch": 2,
+            "weather_smoke_snow_degradation_gap": 3,
+            "ood_unknown_unknowns": 3,
+            "c2_mode_mismatch": 2
+          }
+        },
+        "KA": {
+          "H": {
+            "annotation_errors": 3,
+            "task_formulation_mismatch": 3,
+            "incomplete_validation_criteria_ka": 4,
+            "assumption_mismatch_sensors_comms": 2,
+            "ood_domain_definition_error": 2,
+            "misdiagnosis_error_causes": 2,
+            "swarm_in_the_loop_omission": 3,
+            "hsi_operator_loop_omission": 3,
+            "inadequate_model_architecture": 3,
+            "lack_of_uncertainty_estimation": 4
+          },
+          "T": {
+            "reliance_on_spurious_features": 3,
+            "incorrect_spatial_geometric_interpretation": 2,
+            "frame_mismatch": 2,
+            "representation_mismatch": 2,
+            "correlated_errors_graph_omission": 2,
+            "pseudo_quantification": 2
+          }
+        },
+        "TR": {
+          "H": {
+            "domain_shift": 3,
+            "incomplete_validation_criteria": 4,
+            "data_leakage_split_overestimation": 3,
+            "overfitting_regularization_control_gap": 2,
+            "reproducibility_failure": 2,
+            "continual_online_learning_misuse": 2
+          },
+          "T": {
+            "overfitting": 3,
+            "confabulations": 2,
+            "confidence_miscalibration": 4,
+            "catastrophic_forgetting": 1,
+            "domain_shift_technological": 3,
+            "metric_gaming": 2,
+            "noise_blur_compression_fragility": 3,
+            "correlated_error_structure": 2,
+            "latency_compute_budget_breach": 2,
+            "training_instability": 2,
+            "preprocessing_augmentation_pipeline_defects": 2,
+            "selective_prediction_failure": 4
+          }
+        },
+        "OP": {
+          "H": {
+            "loss_of_situational_awareness": 3,
+            "policy_misconfiguration": 3,
+            "operator_override_error": 2,
+            "ops_gaps": 2,
+            "mission_drift": 2
+          },
+          "T": {
+            "sensor_artifacts": 3,
+            "concept_drift": 3,
+            "cascading_error_propagation": 2,
+            "correlated_perception_errors": 2,
+            "communication_loss_fragmentation": 2,
+            "dynamic_topology": 2,
+            "compute_overload": 2,
+            "model_version_skew": 2,
+            "map_inconsistency": 3,
+            "security_robustness": 3,
+            "fallback_failure": 4,
+            "collective_robustness_loss": 4
+          }
+        }
+      }
+    }
+  }
+}

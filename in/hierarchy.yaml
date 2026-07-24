@@ -45,19 +45,19 @@ KA:
         annotation_errors: {}
         inadequate_model_architecture:
           compare:
-            annotation_errors: -7
+            annotation_errors: 0
         lack_of_uncertainty_estimation:
           compare:
-            annotation_errors: 3
-            inadequate_model_architecture: 9
+            annotation_errors: 0
+            inadequate_model_architecture: 0
     T:
       compare:
         H: 5
       risks:
-        feature_leakage:
+        reliance_on_spurious_features: {}
         incorrect_spatial_geometric_interpretation:
           compare:
-            feature_leakage: 2
+            reliance_on_spurious_features: 0
 
 TR:
   compare:

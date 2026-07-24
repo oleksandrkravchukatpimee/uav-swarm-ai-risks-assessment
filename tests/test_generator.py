@@ -57,7 +57,7 @@ class TestGenerator(unittest.TestCase):
     def test_stage_profile_regression_expected_fragment(self):
         stage_scores = parse_relation_expression(
             expression="KA = TR > OP > KS",
-            valid_ids={"KS": "Knowledge selection", "KA": "Knowledge analysis", "TR": "AGPM Training", "OP": "Model operation"},
+            valid_ids={"KS": "Knowledge selection", "KA": "Knowledge analysis", "TR": "Model Training", "OP": "Model operation"},
             relation_scale={"=": 0, ">": 2, ">>": 4},
         )
         profile = ProfileDefinition(

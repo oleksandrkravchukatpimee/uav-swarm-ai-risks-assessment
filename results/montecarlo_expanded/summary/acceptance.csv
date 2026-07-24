@@ -1,0 +1,5 @@
+profile_id,profile_name,generated_runs,accepted_runs,accepted_pct
+P1,AI/ML-heavy,200,198,99.0
+P2,Swarm/Ops-heavy,200,188,94.0
+P3,Balanced,200,197,98.5
+P4,Safety/Validation-heavy,200,199,99.5

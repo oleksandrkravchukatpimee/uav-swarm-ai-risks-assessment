@@ -27,7 +27,7 @@ P1:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: high
       T:
-        feature_leakage: medium
+        reliance_on_spurious_features: medium
         incorrect_spatial_geometric_interpretation: high
 
     TR:
@@ -75,7 +75,7 @@ P2:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: medium
       T:
-        feature_leakage: low
+        reliance_on_spurious_features: low
         incorrect_spatial_geometric_interpretation: medium
 
     TR:
@@ -123,7 +123,7 @@ P3:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: medium
       T:
-        feature_leakage: medium
+        reliance_on_spurious_features: medium
         incorrect_spatial_geometric_interpretation: medium
 
     TR:
@@ -171,7 +171,7 @@ P4:
         inadequate_model_architecture: medium
         lack_of_uncertainty_estimation: very_high
       T:
-        feature_leakage: low
+        reliance_on_spurious_features: low
         incorrect_spatial_geometric_interpretation: high
 
     TR:

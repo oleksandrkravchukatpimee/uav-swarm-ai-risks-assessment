@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean, median, pstdev
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from montecarlo.profiles import ProfileDefinition
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _ordered_risks(weights: Mapping[str, float]) -> List[str]:
@@ -232,8 +235,16 @@ def _try_generate_charts(
     acceptance_rows: Sequence[Mapping[str, Any]],
 ) -> None:
     try:
+        import matplotlib
+
+        matplotlib.use("Agg")
         import matplotlib.pyplot as plt
-    except Exception:
+    except Exception as exc:
+        LOGGER.warning(
+            "Charts were not generated because Matplotlib could not be loaded: %s. "
+            "Install project dependencies with `python -m pip install -r requirements.txt`.",
+            exc,
+        )
         return
 
     # Accepted vs generated per profile
@@ -243,36 +254,85 @@ def _try_generate_charts(
         accepted = [row["accepted_runs"] for row in acceptance_rows]
         x = list(range(len(labels)))
 
-        plt.figure(figsize=(8, 4))
-        plt.bar([i - 0.2 for i in x], generated, width=0.4, label="Generated")
-        plt.bar([i + 0.2 for i in x], accepted, width=0.4, label="Accepted")
-        plt.xticks(x, labels)
-        plt.ylabel("Runs")
-        plt.title("Accepted vs Generated Runs")
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(summary_dir / "accepted_vs_generated.png", dpi=150)
-        plt.close()
+        fig, ax = plt.subplots(figsize=(8, 4))
+        ax.bar([i - 0.2 for i in x], generated, width=0.4, label="Generated")
+        ax.bar([i + 0.2 for i in x], accepted, width=0.4, label="Accepted")
+        ax.set_xticks(x, labels)
+        ax.set_ylabel("Runs")
+        ax.set_title("Accepted vs Generated Runs")
+        ax.legend()
+        fig.tight_layout()
+        fig.savefig(summary_dir / "accepted_vs_generated.png", dpi=150, bbox_inches="tight")
+        plt.close(fig)
 
     # Heatmap of mean risk weights by profile
     all_profiles = sorted(profile_mean_weights.keys())
     all_risks = sorted({risk for pid in all_profiles for risk in profile_mean_weights.get(pid, {})})
     if all_profiles and all_risks:
-        matrix: List[List[float]] = []
-        for profile_id in all_profiles:
-            matrix.append([float(profile_mean_weights[profile_id].get(risk, 0.0)) for risk in all_risks])
+        matrix = [
+            [float(profile_mean_weights[profile_id].get(risk, 0.0)) for profile_id in all_profiles]
+            for risk in all_risks
+        ]
 
-        plt.figure(figsize=(max(8, len(all_risks) * 0.25), max(4, len(all_profiles) * 0.5)))
-        plt.imshow(matrix, aspect="auto")
-        plt.colorbar(label="Mean global weight")
-        plt.yticks(range(len(all_profiles)), all_profiles)
-        plt.xticks(range(len(all_risks)), all_risks, rotation=90)
-        plt.title("Mean Risk Weights by Profile")
-        plt.tight_layout()
-        plt.savefig(summary_dir / "mean_weight_heatmap.png", dpi=150)
-        plt.close()
+        _save_risk_profile_heatmap(
+            plt=plt,
+            summary_dir=summary_dir,
+            filename="mean_weight_heatmap.png",
+            matrix=matrix,
+            profiles=all_profiles,
+            risks=all_risks,
+            title="Mean Risk Weights by Profile",
+            colorbar_label="Mean global weight",
+        )
 
-    # Top-5 frequency per profile (single chart per profile)
+        for top_k in (5, 10):
+            percentage_key = f"top{top_k}_pct"
+            top_k_matrix = [
+                [
+                    float(
+                        profile_summary.get(profile_id, {})
+                        .get("risk_stats", {})
+                        .get(risk, {})
+                        .get(percentage_key, 0.0)
+                    )
+                    for profile_id in all_profiles
+                ]
+                for risk in all_risks
+            ]
+            _save_risk_profile_heatmap(
+                plt=plt,
+                summary_dir=summary_dir,
+                filename=f"top{top_k}_frequency_heatmap.png",
+                matrix=top_k_matrix,
+                profiles=all_profiles,
+                risks=all_risks,
+                title=f"Top-{top_k} Appearance Rate by Profile",
+                colorbar_label=f"Accepted runs in top-{top_k} (%)",
+                vmin=0.0,
+                vmax=100.0,
+            )
+
+        membership_risks, membership_matrix = _build_top_k_membership_matrix(
+            profile_mean_weights=profile_mean_weights,
+            profiles=all_profiles,
+            top_k=5,
+        )
+        _save_risk_profile_heatmap(
+            plt=plt,
+            summary_dir=summary_dir,
+            filename="top5_membership_heatmap.png",
+            matrix=membership_matrix,
+            profiles=all_profiles,
+            risks=membership_risks,
+            title="Top-5 Risks by Mean Weight and Profile",
+            colorbar_label="Mean global weight",
+            vmin=0.0,
+            missing_color="white",
+            show_grid=True,
+        )
+
+    # Top-5 frequency per profile (single chart per profile).
+    # Horizontal bars keep long hierarchy paths readable.
     for profile_id, payload in profile_summary.items():
         stats = payload.get("risk_stats", {})
         rows = sorted(
@@ -284,14 +344,93 @@ def _try_generate_charts(
         labels = [r[0] for r in rows]
         values = [r[1] for r in rows]
 
-        plt.figure(figsize=(8, 4))
-        plt.bar(labels, values)
-        plt.xticks(rotation=60, ha="right")
-        plt.ylabel("Count")
-        plt.title(f"Top-5 Frequency ({profile_id})")
-        plt.tight_layout()
-        plt.savefig(summary_dir / f"top5_frequency_{profile_id}.png", dpi=150)
-        plt.close()
+        display_labels = _compact_risk_labels(labels)
+        fig, ax = plt.subplots(figsize=(10, max(5, len(rows) * 0.5)))
+        ax.barh(display_labels[::-1], values[::-1])
+        ax.set_xlabel("Count")
+        ax.set_title(f"Top-5 Frequency ({profile_id})")
+        fig.tight_layout()
+        fig.savefig(summary_dir / f"top5_frequency_{profile_id}.png", dpi=150, bbox_inches="tight")
+        plt.close(fig)
+
+
+def _save_risk_profile_heatmap(
+    plt: Any,
+    summary_dir: Path,
+    filename: str,
+    matrix: Sequence[Sequence[float]],
+    profiles: Sequence[str],
+    risks: Sequence[str],
+    title: str,
+    colorbar_label: str,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    missing_color: str | None = None,
+    show_grid: bool = False,
+) -> None:
+    risk_labels = _compact_risk_labels(risks)
+    fig, ax = plt.subplots(
+        figsize=(max(7, len(profiles) * 0.8), max(8, len(risks) * 0.4)),
+    )
+    cmap = None
+    if missing_color is not None:
+        cmap = plt.get_cmap("viridis").with_extremes(bad=missing_color)
+    image = ax.imshow(matrix, aspect="auto", vmin=vmin, vmax=vmax, cmap=cmap)
+    fig.colorbar(image, ax=ax, label=colorbar_label)
+    ax.set_xticks(range(len(profiles)), profiles)
+    ax.set_yticks(range(len(risks)), risk_labels)
+    if show_grid:
+        ax.set_xticks([index - 0.5 for index in range(len(profiles) + 1)], minor=True)
+        ax.set_yticks([index - 0.5 for index in range(len(risks) + 1)], minor=True)
+        ax.grid(which="minor", color="#d0d0d0", linewidth=0.6)
+        ax.tick_params(which="minor", bottom=False, left=False)
+    ax.set_title(title)
+    fig.tight_layout()
+    fig.savefig(summary_dir / filename, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+def _build_top_k_membership_matrix(
+    profile_mean_weights: Mapping[str, Mapping[str, float]],
+    profiles: Sequence[str],
+    top_k: int,
+) -> Tuple[List[str], List[List[float]]]:
+    top_risks_by_profile = {
+        profile_id: _ordered_risks(profile_mean_weights.get(profile_id, {}))[:top_k]
+        for profile_id in profiles
+    }
+    top_risk_sets = {
+        profile_id: set(risks)
+        for profile_id, risks in top_risks_by_profile.items()
+    }
+
+    selected_risks: List[str] = []
+    seen_risks = set()
+    for profile_id in profiles:
+        for risk in top_risks_by_profile[profile_id]:
+            if risk not in seen_risks:
+                seen_risks.add(risk)
+                selected_risks.append(risk)
+
+    matrix = [
+        [
+            float(profile_mean_weights[profile_id][risk])
+            if risk in top_risk_sets[profile_id]
+            else float("nan")
+            for profile_id in profiles
+        ]
+        for risk in selected_risks
+    ]
+    return selected_risks, matrix
+
+
+def _compact_risk_labels(risks: Sequence[str]) -> List[str]:
+    leaf_labels = [risk.rsplit(" / ", 1)[-1] for risk in risks]
+    counts = Counter(leaf_labels)
+    return [
+        leaf if counts[leaf] == 1 else risk
+        for risk, leaf in zip(risks, leaf_labels)
+    ]
 
 
 def _write_markdown_report(report_path: Path, summary_payload: Dict[str, Any]) -> None:

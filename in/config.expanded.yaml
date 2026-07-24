@@ -37,9 +37,9 @@ aliases:
     misdiagnosis_error_causes: Misdiagnosis of error causes
     swarm_in_the_loop_omission: Swarm-in-the-loop omission
     hsi_operator_loop_omission: HSI / operator-loop omission
-    inadequate_model_architecture: Inadequate model architecture
-    lack_of_uncertainty_estimation: Lack of formal uncertainty estimation
-    feature_leakage: Feature leakage / reliance on spurious features
+    inadequate_model_architecture: Inappropriate model architecture
+    lack_of_uncertainty_estimation: Lack of uncertainty estimation
+    reliance_on_spurious_features: Reliance on spurious features
     incorrect_spatial_geometric_interpretation: Incorrect spatial-geometric interpretation
     frame_mismatch: Spatial frame / map mismatch
     representation_mismatch: Representation mismatch for swarm needs

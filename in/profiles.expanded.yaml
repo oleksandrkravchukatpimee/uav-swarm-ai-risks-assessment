@@ -42,10 +42,10 @@ P1:
         misdiagnosis_error_causes: medium
         swarm_in_the_loop_omission: medium
         hsi_operator_loop_omission: medium
-      T:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: very_high
-        feature_leakage: high
+      T:
+        reliance_on_spurious_features: high
         incorrect_spatial_geometric_interpretation: very_high
         frame_mismatch: high
         representation_mismatch: high
@@ -135,10 +135,10 @@ P2:
         misdiagnosis_error_causes: medium
         swarm_in_the_loop_omission: medium
         hsi_operator_loop_omission: medium
-      T:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: medium
-        feature_leakage: high
+      T:
+        reliance_on_spurious_features: high
         incorrect_spatial_geometric_interpretation: medium
         frame_mismatch: medium
         representation_mismatch: medium
@@ -228,10 +228,10 @@ P3:
         misdiagnosis_error_causes: medium
         swarm_in_the_loop_omission: medium
         hsi_operator_loop_omission: medium
-      T:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: medium
-        feature_leakage: high
+      T:
+        reliance_on_spurious_features: high
         incorrect_spatial_geometric_interpretation: very_high
         frame_mismatch: medium
         representation_mismatch: medium
@@ -321,10 +321,10 @@ P4:
         misdiagnosis_error_causes: medium
         swarm_in_the_loop_omission: high
         hsi_operator_loop_omission: high
-      T:
         inadequate_model_architecture: high
         lack_of_uncertainty_estimation: very_high
-        feature_leakage: high
+      T:
+        reliance_on_spurious_features: high
         incorrect_spatial_geometric_interpretation: medium
         frame_mismatch: medium
         representation_mismatch: medium

@@ -19,7 +19,7 @@ aliases:
   stages:
     KS: Knowledge selection
     KA: Knowledge analysis
-    TR: AGPM Training
+    TR: Model Training
     OP: Model operation
   factors:
     H: Human
@@ -82,7 +82,7 @@ P1:
     def test_parse_relation_expression_with_config_scale(self):
         scores = parse_relation_expression(
             "KA = TR > OP > KS",
-            valid_ids={"KA": "Knowledge analysis", "TR": "AGPM Training", "OP": "Model operation", "KS": "Knowledge selection"},
+            valid_ids={"KA": "Knowledge analysis", "TR": "Model Training", "OP": "Model operation", "KS": "Knowledge selection"},
             relation_scale={"=": 0, ">": 2, ">>": 4},
         )
         self.assertEqual(scores["KA"], 0)

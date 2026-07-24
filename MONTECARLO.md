@@ -83,7 +83,7 @@ python -m ahp_cli montecarlo \
   --profiles in/profiles.yaml \
   --samples 200 \
   --seed 42 \
-  --out out/montecarlo \
+  --out results/montecarlo \
   --variability 1.0 \
   --cr-mode any \
   --cr-threshold 0.1
@@ -97,7 +97,7 @@ python -m ahp_cli montecarlo \
   --profiles in/profiles.expanded.yaml \
   --samples 200 \
   --seed 42 \
-  --out out/montecarlo_expanded \
+  --out results/montecarlo_expanded \
   --variability 1.0 \
   --cr-mode any \
   --cr-threshold 0.1
@@ -110,7 +110,7 @@ Optional:
 
 ## Output structure
 ```text
-out/montecarlo/
+results/montecarlo/
   settings.json
   P1/
     generated/
@@ -131,6 +131,9 @@ out/montecarlo/
     report.md
     accepted_vs_generated.png            # optional
     mean_weight_heatmap.png              # optional
+    top5_frequency_heatmap.png            # optional
+    top10_frequency_heatmap.png           # optional
+    top5_membership_heatmap.png           # optional
     top5_frequency_P1.png                # optional
 ```
 

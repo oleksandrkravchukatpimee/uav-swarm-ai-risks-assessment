@@ -4,7 +4,7 @@ aliases:
   stages:
     KS: Knowledge selection
     KA: Knowledge analysis
-    TR: AGPM Training
+    TR: Model Training
     OP: Model operation
 
   factors:
@@ -19,9 +19,9 @@ aliases:
     limited_scene_diversity: Limited scene diversity
 
     annotation_errors: Annotation errors
-    inadequate_model_architecture: Inadequate model architecture
+    inadequate_model_architecture: Inappropriate model architecture
     lack_of_uncertainty_estimation: Lack of uncertainty estimation
-    feature_leakage: Feature leakage
+    reliance_on_spurious_features: Reliance on spurious features
     incorrect_spatial_geometric_interpretation: Incorrect spatial-geometric interpretation
 
     domain_shift: Domain shift

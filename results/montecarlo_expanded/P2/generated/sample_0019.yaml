@@ -1,0 +1,482 @@
+KS:
+  factors:
+    H:
+      risks:
+        representativeness: {}
+        dataset_bias:
+          compare:
+            representativeness: 1
+        temporal_bias:
+          compare:
+            representativeness: 9
+            dataset_bias: 8
+        scale_mismatch:
+          compare:
+            representativeness: 8
+            dataset_bias: 9
+            temporal_bias: -1
+        limited_scene_diversity:
+          compare:
+            representativeness: 7
+            dataset_bias: 6
+            temporal_bias: -1
+            scale_mismatch: 0
+        missing_operational_scenarios:
+          compare:
+            representativeness: 0
+            dataset_bias: 1
+            temporal_bias: -9
+            scale_mismatch: -8
+            limited_scene_diversity: -8
+        label_metadata_leakage:
+          compare:
+            representativeness: 7
+            dataset_bias: 7
+            temporal_bias: 1
+            scale_mismatch: -1
+            limited_scene_diversity: 1
+            missing_operational_scenarios: 9
+        data_contamination_train_test_leakage:
+          compare:
+            representativeness: 7
+            dataset_bias: 9
+            temporal_bias: 0
+            scale_mismatch: 1
+            limited_scene_diversity: 0
+            missing_operational_scenarios: 9
+            label_metadata_leakage: 1
+        data_to_ops_mismatch:
+          compare:
+            representativeness: 7
+            dataset_bias: 8
+            temporal_bias: 1
+            scale_mismatch: -1
+            limited_scene_diversity: -2
+            missing_operational_scenarios: 9
+            label_metadata_leakage: 0
+            data_contamination_train_test_leakage: 0
+        operator_supervision_mismatch:
+          compare:
+            representativeness: 8
+            dataset_bias: 5
+            temporal_bias: 0
+            scale_mismatch: -1
+            limited_scene_diversity: 0
+            missing_operational_scenarios: 8
+            label_metadata_leakage: 1
+            data_contamination_train_test_leakage: 0
+            data_to_ops_mismatch: -1
+    T:
+      compare:
+        H: 8
+      risks:
+        sensor_heterogeneity: {}
+        compression_artifacts_transformations:
+          compare:
+            sensor_heterogeneity: 4
+        georeferencing_sensor_calibration_errors:
+          compare:
+            sensor_heterogeneity: 6
+            compression_artifacts_transformations: 0
+        latency_refresh_rate_mismatch:
+          compare:
+            sensor_heterogeneity: 5
+            compression_artifacts_transformations: -1
+            georeferencing_sensor_calibration_errors: 1
+        correlated_inter_agent_errors_ks:
+          compare:
+            sensor_heterogeneity: -3
+            compression_artifacts_transformations: -7
+            georeferencing_sensor_calibration_errors: -8
+            latency_refresh_rate_mismatch: -8
+        class_event_imbalance:
+          compare:
+            sensor_heterogeneity: 5
+            compression_artifacts_transformations: -1
+            georeferencing_sensor_calibration_errors: 1
+            latency_refresh_rate_mismatch: -1
+            correlated_inter_agent_errors_ks: 7
+        pipeline_mismatch:
+          compare:
+            sensor_heterogeneity: 6
+            compression_artifacts_transformations: 1
+            georeferencing_sensor_calibration_errors: 0
+            latency_refresh_rate_mismatch: 1
+            correlated_inter_agent_errors_ks: 9
+            class_event_imbalance: 1
+        weather_smoke_snow_degradation_gap:
+          compare:
+            sensor_heterogeneity: 1
+            compression_artifacts_transformations: -4
+            georeferencing_sensor_calibration_errors: -5
+            latency_refresh_rate_mismatch: -4
+            correlated_inter_agent_errors_ks: 3
+            class_event_imbalance: -6
+            pipeline_mismatch: -4
+        ood_unknown_unknowns:
+          compare:
+            sensor_heterogeneity: 0
+            compression_artifacts_transformations: -6
+            georeferencing_sensor_calibration_errors: -4
+            latency_refresh_rate_mismatch: -4
+            correlated_inter_agent_errors_ks: 4
+            class_event_imbalance: -6
+            pipeline_mismatch: -4
+            weather_smoke_snow_degradation_gap: 3
+        c2_mode_mismatch:
+          compare:
+            sensor_heterogeneity: 3
+            compression_artifacts_transformations: 1
+            georeferencing_sensor_calibration_errors: -1
+            latency_refresh_rate_mismatch: 0
+            correlated_inter_agent_errors_ks: 9
+            class_event_imbalance: -1
+            pipeline_mismatch: 1
+            weather_smoke_snow_degradation_gap: 4
+            ood_unknown_unknowns: 7
+KA:
+  compare:
+    KS: -2
+  factors:
+    H:
+      risks:
+        annotation_errors: {}
+        task_formulation_mismatch:
+          compare:
+            annotation_errors: -1
+        incomplete_validation_criteria_ka:
+          compare:
+            annotation_errors: 8
+            task_formulation_mismatch: 6
+        assumption_mismatch_sensors_comms:
+          compare:
+            annotation_errors: 7
+            task_formulation_mismatch: 8
+            incomplete_validation_criteria_ka: 1
+        ood_domain_definition_error:
+          compare:
+            annotation_errors: 6
+            task_formulation_mismatch: 9
+            incomplete_validation_criteria_ka: 1
+            assumption_mismatch_sensors_comms: -1
+        misdiagnosis_error_causes:
+          compare:
+            annotation_errors: 9
+            task_formulation_mismatch: 8
+            incomplete_validation_criteria_ka: -1
+            assumption_mismatch_sensors_comms: 0
+            ood_domain_definition_error: -1
+        swarm_in_the_loop_omission:
+          compare:
+            annotation_errors: 6
+            task_formulation_mismatch: 9
+            incomplete_validation_criteria_ka: 0
+            assumption_mismatch_sensors_comms: 1
+            ood_domain_definition_error: -1
+            misdiagnosis_error_causes: 0
+        hsi_operator_loop_omission:
+          compare:
+            annotation_errors: 9
+            task_formulation_mismatch: 6
+            incomplete_validation_criteria_ka: 0
+            assumption_mismatch_sensors_comms: 2
+            ood_domain_definition_error: 1
+            misdiagnosis_error_causes: 0
+            swarm_in_the_loop_omission: 1
+        inadequate_model_architecture:
+          compare:
+            annotation_errors: -1
+            task_formulation_mismatch: 0
+            incomplete_validation_criteria_ka: -6
+            assumption_mismatch_sensors_comms: -8
+            ood_domain_definition_error: -7
+            misdiagnosis_error_causes: -8
+            swarm_in_the_loop_omission: -7
+            hsi_operator_loop_omission: -8
+        lack_of_uncertainty_estimation:
+          compare:
+            annotation_errors: 9
+            task_formulation_mismatch: 9
+            incomplete_validation_criteria_ka: 0
+            assumption_mismatch_sensors_comms: -1
+            ood_domain_definition_error: -3
+            misdiagnosis_error_causes: -1
+            swarm_in_the_loop_omission: -1
+            hsi_operator_loop_omission: 2
+            inadequate_model_architecture: 8
+    T:
+      compare:
+        H: -9
+      risks:
+        reliance_on_spurious_features: {}
+        incorrect_spatial_geometric_interpretation:
+          compare:
+            reliance_on_spurious_features: 4
+        frame_mismatch:
+          compare:
+            reliance_on_spurious_features: 4
+            incorrect_spatial_geometric_interpretation: 0
+        representation_mismatch:
+          compare:
+            reliance_on_spurious_features: 5
+            incorrect_spatial_geometric_interpretation: -1
+            frame_mismatch: 0
+        correlated_errors_graph_omission:
+          compare:
+            reliance_on_spurious_features: -4
+            incorrect_spatial_geometric_interpretation: -5
+            frame_mismatch: -7
+            representation_mismatch: -7
+        pseudo_quantification:
+          compare:
+            reliance_on_spurious_features: 4
+            incorrect_spatial_geometric_interpretation: 0
+            frame_mismatch: 1
+            representation_mismatch: 0
+            correlated_errors_graph_omission: 7
+TR:
+  compare:
+    KS: -3
+    KA: -2
+  factors:
+    H:
+      risks:
+        domain_shift: {}
+        incomplete_validation_criteria:
+          compare:
+            domain_shift: 7
+        data_leakage_split_overestimation:
+          compare:
+            domain_shift: 1
+            incomplete_validation_criteria: -9
+        overfitting_regularization_control_gap:
+          compare:
+            domain_shift: 8
+            incomplete_validation_criteria: 1
+            data_leakage_split_overestimation: 8
+        reproducibility_failure:
+          compare:
+            domain_shift: 7
+            incomplete_validation_criteria: -1
+            data_leakage_split_overestimation: 9
+            overfitting_regularization_control_gap: -1
+        continual_online_learning_misuse:
+          compare:
+            domain_shift: 9
+            incomplete_validation_criteria: -2
+            data_leakage_split_overestimation: 7
+            overfitting_regularization_control_gap: -1
+            reproducibility_failure: 0
+    T:
+      compare:
+        H: -8
+      risks:
+        overfitting: {}
+        confabulations:
+          compare:
+            overfitting: 1
+        confidence_miscalibration:
+          compare:
+            overfitting: 3
+            confabulations: 0
+        catastrophic_forgetting:
+          compare:
+            overfitting: 4
+            confabulations: 3
+            confidence_miscalibration: 3
+        domain_shift_technological:
+          compare:
+            overfitting: -1
+            confabulations: -3
+            confidence_miscalibration: -4
+            catastrophic_forgetting: -6
+        metric_gaming:
+          compare:
+            overfitting: 4
+            confabulations: -1
+            confidence_miscalibration: 0
+            catastrophic_forgetting: -4
+            domain_shift_technological: 2
+        noise_blur_compression_fragility:
+          compare:
+            overfitting: 0
+            confabulations: -3
+            confidence_miscalibration: -3
+            catastrophic_forgetting: -5
+            domain_shift_technological: 0
+            metric_gaming: -5
+        correlated_error_structure:
+          compare:
+            overfitting: -3
+            confabulations: -5
+            confidence_miscalibration: -3
+            catastrophic_forgetting: -9
+            domain_shift_technological: -4
+            metric_gaming: -6
+            noise_blur_compression_fragility: -3
+        latency_compute_budget_breach:
+          compare:
+            overfitting: 2
+            confabulations: -3
+            confidence_miscalibration: 0
+            catastrophic_forgetting: -3
+            domain_shift_technological: 4
+            metric_gaming: -1
+            noise_blur_compression_fragility: 4
+            correlated_error_structure: 6
+        training_instability:
+          compare:
+            overfitting: 0
+            confabulations: 0
+            confidence_miscalibration: 0
+            catastrophic_forgetting: -2
+            domain_shift_technological: 4
+            metric_gaming: -1
+            noise_blur_compression_fragility: 3
+            correlated_error_structure: 5
+            latency_compute_budget_breach: 0
+        preprocessing_augmentation_pipeline_defects:
+          compare:
+            overfitting: 2
+            confabulations: -2
+            confidence_miscalibration: 0
+            catastrophic_forgetting: -2
+            domain_shift_technological: 3
+            metric_gaming: -1
+            noise_blur_compression_fragility: 3
+            correlated_error_structure: 7
+            latency_compute_budget_breach: 0
+            training_instability: -1
+        selective_prediction_failure:
+          compare:
+            overfitting: 3
+            confabulations: -1
+            confidence_miscalibration: 0
+            catastrophic_forgetting: -3
+            domain_shift_technological: 3
+            metric_gaming: 0
+            noise_blur_compression_fragility: 4
+            correlated_error_structure: 6
+            latency_compute_budget_breach: -2
+            training_instability: 2
+            preprocessing_augmentation_pipeline_defects: -1
+OP:
+  compare:
+    KS: -7
+    KA: -5
+    TR: -4
+  factors:
+    H:
+      risks:
+        loss_of_situational_awareness: {}
+        policy_misconfiguration:
+          compare:
+            loss_of_situational_awareness: 9
+        operator_override_error:
+          compare:
+            loss_of_situational_awareness: 8
+            policy_misconfiguration: 0
+        ops_gaps:
+          compare:
+            loss_of_situational_awareness: 7
+            policy_misconfiguration: 0
+            operator_override_error: 0
+        mission_drift:
+          compare:
+            loss_of_situational_awareness: 7
+            policy_misconfiguration: 1
+            operator_override_error: -1
+            ops_gaps: -1
+    T:
+      compare:
+        H: -6
+      risks:
+        sensor_artifacts: {}
+        concept_drift:
+          compare:
+            sensor_artifacts: -2
+        cascading_error_propagation:
+          compare:
+            sensor_artifacts: -7
+            concept_drift: -8
+        correlated_perception_errors:
+          compare:
+            sensor_artifacts: -7
+            concept_drift: -8
+            cascading_error_propagation: 0
+        communication_loss_fragmentation:
+          compare:
+            sensor_artifacts: -9
+            concept_drift: -8
+            cascading_error_propagation: 0
+            correlated_perception_errors: 0
+        dynamic_topology:
+          compare:
+            sensor_artifacts: -8
+            concept_drift: -8
+            cascading_error_propagation: -1
+            correlated_perception_errors: -1
+            communication_loss_fragmentation: 1
+        compute_overload:
+          compare:
+            sensor_artifacts: 1
+            concept_drift: 0
+            cascading_error_propagation: 9
+            correlated_perception_errors: 8
+            communication_loss_fragmentation: 9
+            dynamic_topology: 8
+        model_version_skew:
+          compare:
+            sensor_artifacts: 1
+            concept_drift: -1
+            cascading_error_propagation: 8
+            correlated_perception_errors: 8
+            communication_loss_fragmentation: 8
+            dynamic_topology: 9
+            compute_overload: 2
+        map_inconsistency:
+          compare:
+            sensor_artifacts: -2
+            concept_drift: 0
+            cascading_error_propagation: 7
+            correlated_perception_errors: 8
+            communication_loss_fragmentation: 9
+            dynamic_topology: 8
+            compute_overload: -1
+            model_version_skew: 1
+        security_robustness:
+          compare:
+            sensor_artifacts: -1
+            concept_drift: 0
+            cascading_error_propagation: 8
+            correlated_perception_errors: 9
+            communication_loss_fragmentation: 6
+            dynamic_topology: 8
+            compute_overload: -1
+            model_version_skew: 0
+            map_inconsistency: 1
+        fallback_failure:
+          compare:
+            sensor_artifacts: -1
+            concept_drift: 0
+            cascading_error_propagation: 8
+            correlated_perception_errors: 7
+            communication_loss_fragmentation: 7
+            dynamic_topology: 7
+            compute_overload: 1
+            model_version_skew: 0
+            map_inconsistency: 1
+            security_robustness: 1
+        collective_robustness_loss:
+          compare:
+            sensor_artifacts: -9
+            concept_drift: -9
+            cascading_error_propagation: 1
+            correlated_perception_errors: -1
+            communication_loss_fragmentation: -2
+            dynamic_topology: -1
+            compute_overload: -8
+            model_version_skew: -8
+            map_inconsistency: -9
+            security_robustness: -9
+            fallback_failure: -8

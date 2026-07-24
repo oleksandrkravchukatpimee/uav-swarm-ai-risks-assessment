@@ -15,7 +15,7 @@ DEFAULT_PROFILE_BIASES: Dict[str, ProfileBiasConfig] = {
     "P1": ProfileBiasConfig(
         factor_scores_by_stage={
             "Knowledge analysis": {"Human": 1, "Technological": 1},
-            "AGPM Training": {"Human": 1, "Technological": 1},
+            "Model Training": {"Human": 1, "Technological": 1},
         },
         risk_scores_global={
             "Lack of uncertainty estimation": 3,
@@ -43,7 +43,7 @@ DEFAULT_PROFILE_BIASES: Dict[str, ProfileBiasConfig] = {
     "P4": ProfileBiasConfig(
         factor_scores_by_stage={
             "Knowledge analysis": {"Human": 2},
-            "AGPM Training": {"Human": 2},
+            "Model Training": {"Human": 2},
             "Model operation": {"Human": 1, "Technological": 1},
         },
         risk_scores_global={

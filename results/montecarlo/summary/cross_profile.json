@@ -1,0 +1,73 @@
+{
+  "invariant_risks_top_n": 5,
+  "invariant_risks": [
+    "Knowledge analysis / Technological / Incorrect spatial-geometric interpretation",
+    "Model operation / Technological / Cascading error propagation"
+  ],
+  "sensitive_rank_range_threshold": 5,
+  "profile_sensitive_risks": [
+    "Knowledge analysis / Human / Annotation errors",
+    "Knowledge analysis / Human / Inappropriate model architecture",
+    "Knowledge analysis / Human / Lack of uncertainty estimation",
+    "Knowledge analysis / Technological / Reliance on spurious features",
+    "Knowledge selection / Human / Data representativeness",
+    "Knowledge selection / Human / Dataset bias",
+    "Model Training / Human / Domain shift",
+    "Model Training / Human / Incomplete validation criteria",
+    "Model Training / Technological / Catastrophic forgetting",
+    "Model Training / Technological / Confabulations",
+    "Model Training / Technological / Confidence miscalibration",
+    "Model Training / Technological / Overfitting",
+    "Model operation / Human / Loss of situational awareness",
+    "Model operation / Technological / Concept drift",
+    "Model operation / Technological / Sensor artifacts"
+  ],
+  "risk_rank_ranges": {
+    "Knowledge analysis / Human / Annotation errors": 10,
+    "Knowledge analysis / Human / Inappropriate model architecture": 9,
+    "Knowledge analysis / Human / Lack of uncertainty estimation": 7,
+    "Knowledge analysis / Technological / Incorrect spatial-geometric interpretation": 4,
+    "Knowledge analysis / Technological / Reliance on spurious features": 8,
+    "Knowledge selection / Human / Data representativeness": 10,
+    "Knowledge selection / Human / Dataset bias": 5,
+    "Knowledge selection / Human / Limited scene diversity": 3,
+    "Knowledge selection / Human / Scale mismatch": 4,
+    "Knowledge selection / Human / Temporal bias": 4,
+    "Model Training / Human / Domain shift": 10,
+    "Model Training / Human / Incomplete validation criteria": 5,
+    "Model Training / Technological / Catastrophic forgetting": 11,
+    "Model Training / Technological / Confabulations": 9,
+    "Model Training / Technological / Confidence miscalibration": 12,
+    "Model Training / Technological / Overfitting": 8,
+    "Model operation / Human / Loss of situational awareness": 12,
+    "Model operation / Technological / Cascading error propagation": 3,
+    "Model operation / Technological / Concept drift": 12,
+    "Model operation / Technological / Sensor artifacts": 12
+  },
+  "profile_correlations": {
+    "P1__P2": {
+      "spearman_rho": 0.643609022556391,
+      "kendall_tau": 0.4421052631578947
+    },
+    "P1__P3": {
+      "spearman_rho": 0.2962406015037594,
+      "kendall_tau": 0.22105263157894736
+    },
+    "P1__P4": {
+      "spearman_rho": 0.7172932330827068,
+      "kendall_tau": 0.5894736842105263
+    },
+    "P2__P3": {
+      "spearman_rho": 0.5233082706766917,
+      "kendall_tau": 0.4421052631578947
+    },
+    "P2__P4": {
+      "spearman_rho": 0.7533834586466166,
+      "kendall_tau": 0.5789473684210527
+    },
+    "P3__P4": {
+      "spearman_rho": 0.4390977443609022,
+      "kendall_tau": 0.29473684210526313
+    }
+  }
+}

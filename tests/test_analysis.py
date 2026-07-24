@@ -1,8 +1,9 @@
 import tempfile
 import unittest
+from math import isnan
 from pathlib import Path
 
-from montecarlo.analysis import summarize_results
+from montecarlo.analysis import _build_top_k_membership_matrix, summarize_results
 from montecarlo.profiles import ProfileDefinition
 
 
@@ -45,6 +46,26 @@ class TestAnalysis(unittest.TestCase):
             self.assertIn("P1", payload["profiles"])
             self.assertEqual(payload["profiles"]["P1"]["accepted_runs"], 2)
             self.assertIn("cross_profile", payload)
+            summary_dir = Path(tmp) / "summary"
+            self.assertGreater((summary_dir / "top5_frequency_heatmap.png").stat().st_size, 0)
+            self.assertGreater((summary_dir / "top10_frequency_heatmap.png").stat().st_size, 0)
+            self.assertGreater((summary_dir / "top5_membership_heatmap.png").stat().st_size, 0)
+
+    def test_top_k_membership_matrix_masks_non_members(self):
+        risks, matrix = _build_top_k_membership_matrix(
+            profile_mean_weights={
+                "P1": {"R1": 0.7, "R2": 0.3},
+                "P2": {"R1": 0.2, "R2": 0.8},
+            },
+            profiles=["P1", "P2"],
+            top_k=1,
+        )
+
+        self.assertEqual(risks, ["R1", "R2"])
+        self.assertEqual(matrix[0][0], 0.7)
+        self.assertTrue(isnan(matrix[0][1]))
+        self.assertTrue(isnan(matrix[1][0]))
+        self.assertEqual(matrix[1][1], 0.8)
 
 
 if __name__ == "__main__":

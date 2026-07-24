@@ -1,0 +1,94 @@
+KS:
+  factors:
+    H:
+      risks:
+        representativeness: {}
+        dataset_bias:
+          compare:
+            representativeness: 1
+        temporal_bias:
+          compare:
+            representativeness: 9
+            dataset_bias: 7
+        scale_mismatch:
+          compare:
+            representativeness: 7
+            dataset_bias: 7
+            temporal_bias: -1
+        limited_scene_diversity:
+          compare:
+            representativeness: 8
+            dataset_bias: 8
+            temporal_bias: -1
+            scale_mismatch: 1
+KA:
+  compare:
+    KS: -8
+  factors:
+    H:
+      risks:
+        annotation_errors: {}
+        inadequate_model_architecture:
+          compare:
+            annotation_errors: -6
+        lack_of_uncertainty_estimation:
+          compare:
+            annotation_errors: -9
+            inadequate_model_architecture: -2
+    T:
+      compare:
+        H: -8
+      risks:
+        reliance_on_spurious_features: {}
+        incorrect_spatial_geometric_interpretation:
+          compare:
+            reliance_on_spurious_features: -7
+TR:
+  compare:
+    KS: -7
+    KA: -1
+  factors:
+    H:
+      risks:
+        domain_shift: {}
+        incomplete_validation_criteria:
+          compare:
+            domain_shift: 2
+    T:
+      compare:
+        H: -9
+      risks:
+        overfitting: {}
+        confabulations:
+          compare:
+            overfitting: -5
+        confidence_miscalibration:
+          compare:
+            overfitting: -5
+            confabulations: 1
+        catastrophic_forgetting:
+          compare:
+            overfitting: 4
+            confabulations: 8
+            confidence_miscalibration: 7
+OP:
+  compare:
+    KS: -3
+    KA: 3
+    TR: 4
+  factors:
+    H:
+      risks:
+        loss_of_situational_awareness: {}
+    T:
+      compare:
+        H: -9
+      risks:
+        sensor_artifacts: {}
+        concept_drift:
+          compare:
+            sensor_artifacts: 1
+        cascading_error_propagation:
+          compare:
+            sensor_artifacts: -7
+            concept_drift: -9

@@ -1,0 +1,1075 @@
+{
+  "profile_id": "P3",
+  "profile_name": "Balanced",
+  "profile_description": "Balanced profile with moderate priorities across the lifecycle and risk groups.",
+  "profile_expression": "OP > TR = KA > KS",
+  "stage_scores": {
+    "OP": 0,
+    "TR": -2,
+    "KA": -2,
+    "KS": -4
+  },
+  "stage_pairwise_deltas": {
+    "OP -> TR": -4,
+    "OP -> KA": -4,
+    "OP -> KS": -8,
+    "TR -> OP": 4,
+    "TR -> KA": 0,
+    "TR -> KS": -4,
+    "KA -> OP": 4,
+    "KA -> TR": 0,
+    "KA -> KS": -4,
+    "KS -> OP": 8,
+    "KS -> TR": 4,
+    "KS -> KA": 4
+  },
+  "parsed_factor_rules": {
+    "KS": "H = T",
+    "KA": "T = H",
+    "TR": "T = H",
+    "OP": "T > H"
+  },
+  "parsed_risk_profile": {
+    "KS": {
+      "H": {
+        "representativeness": 2,
+        "dataset_bias": 2,
+        "temporal_bias": 2,
+        "scale_mismatch": 2,
+        "limited_scene_diversity": 2
+      }
+    },
+    "KA": {
+      "H": {
+        "annotation_errors": 2,
+        "inadequate_model_architecture": 2,
+        "lack_of_uncertainty_estimation": 2
+      },
+      "T": {
+        "reliance_on_spurious_features": 2,
+        "incorrect_spatial_geometric_interpretation": 2
+      }
+    },
+    "TR": {
+      "H": {
+        "domain_shift": 2,
+        "incomplete_validation_criteria": 2
+      },
+      "T": {
+        "overfitting": 2,
+        "confabulations": 2,
+        "confidence_miscalibration": 2,
+        "catastrophic_forgetting": 1
+      }
+    },
+    "OP": {
+      "H": {
+        "loss_of_situational_awareness": 2
+      },
+      "T": {
+        "sensor_artifacts": 2,
+        "concept_drift": 2,
+        "cascading_error_propagation": 3
+      }
+    }
+  },
+  "factor_biases": {
+    "KS": {
+      "H": 0,
+      "T": 0
+    },
+    "KA": {
+      "T": 0,
+      "H": 0
+    },
+    "TR": {
+      "T": 0,
+      "H": 0
+    },
+    "OP": {
+      "T": 0,
+      "H": -2
+    }
+  },
+  "risk_biases_global": {},
+  "risk_biases_by_path": {
+    "KS / H": {
+      "representativeness": 2,
+      "dataset_bias": 2,
+      "temporal_bias": 2,
+      "scale_mismatch": 2,
+      "limited_scene_diversity": 2
+    },
+    "KA / H": {
+      "annotation_errors": 2,
+      "inadequate_model_architecture": 2,
+      "lack_of_uncertainty_estimation": 2
+    },
+    "KA / T": {
+      "reliance_on_spurious_features": 2,
+      "incorrect_spatial_geometric_interpretation": 2
+    },
+    "TR / H": {
+      "domain_shift": 2,
+      "incomplete_validation_criteria": 2
+    },
+    "TR / T": {
+      "overfitting": 2,
+      "confabulations": 2,
+      "confidence_miscalibration": 2,
+      "catastrophic_forgetting": 1
+    },
+    "OP / H": {
+      "loss_of_situational_awareness": 2
+    },
+    "OP / T": {
+      "sensor_artifacts": 2,
+      "concept_drift": 2,
+      "cascading_error_propagation": 3
+    }
+  },
+  "sample_index": 24,
+  "sample_seed": 18200066,
+  "variability": {
+    "stage_sigma": 1.0,
+    "factor_sigma": 1.0,
+    "risk_sigma": 1.0
+  },
+  "perturbations": [
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "KA",
+      "target": "KS",
+      "old_value": -2,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": -4,
+      "deterministic_delta": -2,
+      "random_noise": -1,
+      "new_value": -5
+    },
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "TR",
+      "target": "KS",
+      "old_value": -3,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": -4,
+      "deterministic_delta": -1,
+      "random_noise": 0,
+      "new_value": -4
+    },
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "TR",
+      "target": "KA",
+      "old_value": -2,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 2,
+      "random_noise": 2,
+      "new_value": 2
+    },
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "OP",
+      "target": "KS",
+      "old_value": -3,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": -8,
+      "deterministic_delta": -5,
+      "random_noise": -1,
+      "new_value": -9
+    },
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "OP",
+      "target": "KA",
+      "old_value": -3,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": -4,
+      "deterministic_delta": -1,
+      "random_noise": -2,
+      "new_value": -6
+    },
+    {
+      "scope": "stage",
+      "group_path": [],
+      "current": "OP",
+      "target": "TR",
+      "old_value": -4,
+      "parsed_profile_order": [
+        [
+          "OP"
+        ],
+        [
+          "KA",
+          "TR"
+        ],
+        [
+          "KS"
+        ]
+      ],
+      "relative_ranks": {
+        "OP": 0,
+        "KA": 1,
+        "TR": 1,
+        "KS": 2
+      },
+      "pre_montecarlo_value": -4,
+      "deterministic_delta": 0,
+      "random_noise": -1,
+      "new_value": -5
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "dataset_bias",
+      "target": "representativeness",
+      "old_value": 1,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -1,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "temporal_bias",
+      "target": "representativeness",
+      "old_value": 2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -2,
+      "random_noise": 1,
+      "new_value": 1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "temporal_bias",
+      "target": "dataset_bias",
+      "old_value": 2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -2,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "scale_mismatch",
+      "target": "representativeness",
+      "old_value": 2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -2,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "scale_mismatch",
+      "target": "dataset_bias",
+      "old_value": 2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -2,
+      "random_noise": -2,
+      "new_value": -2
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "scale_mismatch",
+      "target": "temporal_bias",
+      "old_value": 1,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -1,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "limited_scene_diversity",
+      "target": "representativeness",
+      "old_value": 3,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -3,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "limited_scene_diversity",
+      "target": "dataset_bias",
+      "old_value": 3,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -3,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "limited_scene_diversity",
+      "target": "temporal_bias",
+      "old_value": -2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 2,
+      "random_noise": 1,
+      "new_value": 1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KS",
+        "H"
+      ],
+      "current": "limited_scene_diversity",
+      "target": "scale_mismatch",
+      "old_value": -2,
+      "parsed_profile_order": [
+        [
+          "representativeness",
+          "dataset_bias",
+          "temporal_bias",
+          "scale_mismatch",
+          "limited_scene_diversity"
+        ]
+      ],
+      "relative_ranks": {
+        "representativeness": 0,
+        "dataset_bias": 0,
+        "temporal_bias": 0,
+        "scale_mismatch": 0,
+        "limited_scene_diversity": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 2,
+      "random_noise": 1,
+      "new_value": 1
+    },
+    {
+      "scope": "factor",
+      "group_path": [
+        "KA"
+      ],
+      "current": "T",
+      "target": "H",
+      "old_value": 5,
+      "parsed_profile_order": [
+        [
+          "H",
+          "T"
+        ]
+      ],
+      "relative_ranks": {
+        "H": 0,
+        "T": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -5,
+      "random_noise": 1,
+      "new_value": 1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KA",
+        "H"
+      ],
+      "current": "inadequate_model_architecture",
+      "target": "annotation_errors",
+      "old_value": 0,
+      "parsed_profile_order": [
+        [
+          "annotation_errors",
+          "inadequate_model_architecture",
+          "lack_of_uncertainty_estimation"
+        ]
+      ],
+      "relative_ranks": {
+        "annotation_errors": 0,
+        "inadequate_model_architecture": 0,
+        "lack_of_uncertainty_estimation": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 0,
+      "random_noise": 1,
+      "new_value": 1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KA",
+        "H"
+      ],
+      "current": "lack_of_uncertainty_estimation",
+      "target": "annotation_errors",
+      "old_value": 0,
+      "parsed_profile_order": [
+        [
+          "annotation_errors",
+          "inadequate_model_architecture",
+          "lack_of_uncertainty_estimation"
+        ]
+      ],
+      "relative_ranks": {
+        "annotation_errors": 0,
+        "inadequate_model_architecture": 0,
+        "lack_of_uncertainty_estimation": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 0,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KA",
+        "H"
+      ],
+      "current": "lack_of_uncertainty_estimation",
+      "target": "inadequate_model_architecture",
+      "old_value": 0,
+      "parsed_profile_order": [
+        [
+          "annotation_errors",
+          "inadequate_model_architecture",
+          "lack_of_uncertainty_estimation"
+        ]
+      ],
+      "relative_ranks": {
+        "annotation_errors": 0,
+        "inadequate_model_architecture": 0,
+        "lack_of_uncertainty_estimation": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 0,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "KA",
+        "T"
+      ],
+      "current": "incorrect_spatial_geometric_interpretation",
+      "target": "reliance_on_spurious_features",
+      "old_value": 0,
+      "parsed_profile_order": [
+        [
+          "reliance_on_spurious_features",
+          "incorrect_spatial_geometric_interpretation"
+        ]
+      ],
+      "relative_ranks": {
+        "reliance_on_spurious_features": 0,
+        "incorrect_spatial_geometric_interpretation": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 0,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "factor",
+      "group_path": [
+        "TR"
+      ],
+      "current": "T",
+      "target": "H",
+      "old_value": -3,
+      "parsed_profile_order": [
+        [
+          "H",
+          "T"
+        ]
+      ],
+      "relative_ranks": {
+        "H": 0,
+        "T": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 3,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "H"
+      ],
+      "current": "incomplete_validation_criteria",
+      "target": "domain_shift",
+      "old_value": -2,
+      "parsed_profile_order": [
+        [
+          "domain_shift",
+          "incomplete_validation_criteria"
+        ]
+      ],
+      "relative_ranks": {
+        "domain_shift": 0,
+        "incomplete_validation_criteria": 0
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 2,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "confabulations",
+      "target": "overfitting",
+      "old_value": -4,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": 4,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "confidence_miscalibration",
+      "target": "overfitting",
+      "old_value": 2,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -2,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "confidence_miscalibration",
+      "target": "confabulations",
+      "old_value": 5,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -5,
+      "random_noise": 0,
+      "new_value": 0
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "catastrophic_forgetting",
+      "target": "overfitting",
+      "old_value": -5,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 8,
+      "deterministic_delta": 13,
+      "random_noise": 0,
+      "new_value": 8
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "catastrophic_forgetting",
+      "target": "confabulations",
+      "old_value": -3,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 8,
+      "deterministic_delta": 11,
+      "random_noise": 1,
+      "new_value": 9
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "TR",
+        "T"
+      ],
+      "current": "catastrophic_forgetting",
+      "target": "confidence_miscalibration",
+      "old_value": -7,
+      "parsed_profile_order": [
+        [
+          "overfitting",
+          "confabulations",
+          "confidence_miscalibration"
+        ],
+        [
+          "catastrophic_forgetting"
+        ]
+      ],
+      "relative_ranks": {
+        "overfitting": 0,
+        "confabulations": 0,
+        "confidence_miscalibration": 0,
+        "catastrophic_forgetting": 1
+      },
+      "pre_montecarlo_value": 8,
+      "deterministic_delta": 15,
+      "random_noise": 2,
+      "new_value": 9
+    },
+    {
+      "scope": "factor",
+      "group_path": [
+        "OP"
+      ],
+      "current": "T",
+      "target": "H",
+      "old_value": -7,
+      "parsed_profile_order": [
+        [
+          "T"
+        ],
+        [
+          "H"
+        ]
+      ],
+      "relative_ranks": {
+        "T": 0,
+        "H": 1
+      },
+      "pre_montecarlo_value": -8,
+      "deterministic_delta": -1,
+      "random_noise": 1,
+      "new_value": -7
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "OP",
+        "T"
+      ],
+      "current": "concept_drift",
+      "target": "sensor_artifacts",
+      "old_value": 3,
+      "parsed_profile_order": [
+        [
+          "cascading_error_propagation"
+        ],
+        [
+          "sensor_artifacts",
+          "concept_drift"
+        ]
+      ],
+      "relative_ranks": {
+        "cascading_error_propagation": 0,
+        "sensor_artifacts": 1,
+        "concept_drift": 1
+      },
+      "pre_montecarlo_value": 0,
+      "deterministic_delta": -3,
+      "random_noise": -1,
+      "new_value": -1
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "OP",
+        "T"
+      ],
+      "current": "cascading_error_propagation",
+      "target": "sensor_artifacts",
+      "old_value": -4,
+      "parsed_profile_order": [
+        [
+          "cascading_error_propagation"
+        ],
+        [
+          "sensor_artifacts",
+          "concept_drift"
+        ]
+      ],
+      "relative_ranks": {
+        "cascading_error_propagation": 0,
+        "sensor_artifacts": 1,
+        "concept_drift": 1
+      },
+      "pre_montecarlo_value": -8,
+      "deterministic_delta": -4,
+      "random_noise": 0,
+      "new_value": -8
+    },
+    {
+      "scope": "risk",
+      "group_path": [
+        "OP",
+        "T"
+      ],
+      "current": "cascading_error_propagation",
+      "target": "concept_drift",
+      "old_value": -5,
+      "parsed_profile_order": [
+        [
+          "cascading_error_propagation"
+        ],
+        [
+          "sensor_artifacts",
+          "concept_drift"
+        ]
+      ],
+      "relative_ranks": {
+        "cascading_error_propagation": 0,
+        "sensor_artifacts": 1,
+        "concept_drift": 1
+      },
+      "pre_montecarlo_value": -8,
+      "deterministic_delta": -3,
+      "random_noise": 0,
+      "new_value": -8
+    }
+  ]
+}
