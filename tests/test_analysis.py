@@ -55,7 +55,7 @@ class TestAnalysis(unittest.TestCase):
         risks, matrix = _build_top_k_membership_matrix(
             profile_mean_weights={
                 "P1": {"R1": 0.7, "R2": 0.3},
-                "P2": {"R1": 0.2, "R2": 0.8},
+                "P2": {"R1": 0.69, "R2": 0.8},
             },
             profiles=["P1", "P2"],
             top_k=1,

@@ -11,6 +11,8 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 from montecarlo.profiles import ProfileDefinition
 
 LOGGER = logging.getLogger(__name__)
+CHART_LABEL_FONT_SIZE = 14
+CHART_TITLE_FONT_SIZE = 16
 
 
 def _ordered_risks(weights: Mapping[str, float]) -> List[str]:
@@ -247,27 +249,37 @@ def _try_generate_charts(
         )
         return
 
-    # Accepted vs generated per profile
+    # Acceptance percentage per profile
     if acceptance_rows:
         labels = [row["profile_id"] for row in acceptance_rows]
-        generated = [row["generated_runs"] for row in acceptance_rows]
-        accepted = [row["accepted_runs"] for row in acceptance_rows]
+        accepted_pct = [float(row["accepted_pct"]) for row in acceptance_rows]
         x = list(range(len(labels)))
 
         fig, ax = plt.subplots(figsize=(8, 4))
-        ax.bar([i - 0.2 for i in x], generated, width=0.4, label="Generated")
-        ax.bar([i + 0.2 for i in x], accepted, width=0.4, label="Accepted")
-        ax.set_xticks(x, labels)
-        ax.set_ylabel("Runs")
-        ax.set_title("Accepted vs Generated Runs")
-        ax.legend()
+        bars = ax.bar(x, accepted_pct, width=0.6)
+        ax.set_xticks(x, labels, fontsize=CHART_LABEL_FONT_SIZE)
+        y_ticks = list(range(0, 101, 20))
+        ax.set_yticks(y_ticks, [f"{value}%" for value in y_ticks], fontsize=CHART_LABEL_FONT_SIZE)
+        ax.set_ylim(0, 105)
+        ax.set_ylabel("Accepted iterations (%)", fontsize=CHART_LABEL_FONT_SIZE)
+        ax.set_title("Accepted Iterations by Profile", fontsize=CHART_TITLE_FONT_SIZE)
+        ax.bar_label(
+            bars,
+            labels=[f"{value:.1f}%" for value in accepted_pct],
+            padding=3,
+            fontsize=CHART_LABEL_FONT_SIZE,
+        )
         fig.tight_layout()
         fig.savefig(summary_dir / "accepted_vs_generated.png", dpi=150, bbox_inches="tight")
         plt.close(fig)
 
     # Heatmap of mean risk weights by profile
     all_profiles = sorted(profile_mean_weights.keys())
-    all_risks = sorted({risk for pid in all_profiles for risk in profile_mean_weights.get(pid, {})})
+    all_risks = _sort_risks_by_summed_weights(
+        risks={risk for pid in all_profiles for risk in profile_mean_weights.get(pid, {})},
+        profile_mean_weights=profile_mean_weights,
+        profiles=all_profiles,
+    )
     if all_profiles and all_risks:
         matrix = [
             [float(profile_mean_weights[profile_id].get(risk, 0.0)) for profile_id in all_profiles]
@@ -283,6 +295,7 @@ def _try_generate_charts(
             risks=all_risks,
             title="Mean Risk Weights by Profile",
             colorbar_label="Mean global weight",
+            show_grid=True,
         )
 
         for top_k in (5, 10):
@@ -310,6 +323,7 @@ def _try_generate_charts(
                 colorbar_label=f"Accepted runs in top-{top_k} (%)",
                 vmin=0.0,
                 vmax=100.0,
+                show_grid=True,
             )
 
         membership_risks, membership_matrix = _build_top_k_membership_matrix(
@@ -347,8 +361,9 @@ def _try_generate_charts(
         display_labels = _compact_risk_labels(labels)
         fig, ax = plt.subplots(figsize=(10, max(5, len(rows) * 0.5)))
         ax.barh(display_labels[::-1], values[::-1])
-        ax.set_xlabel("Count")
-        ax.set_title(f"Top-5 Frequency ({profile_id})")
+        ax.tick_params(axis="both", labelsize=CHART_LABEL_FONT_SIZE)
+        ax.set_xlabel("Count", fontsize=CHART_LABEL_FONT_SIZE)
+        ax.set_title(f"Top-5 Frequency ({profile_id})", fontsize=CHART_TITLE_FONT_SIZE)
         fig.tight_layout()
         fig.savefig(summary_dir / f"top5_frequency_{profile_id}.png", dpi=150, bbox_inches="tight")
         plt.close(fig)
@@ -372,19 +387,21 @@ def _save_risk_profile_heatmap(
     fig, ax = plt.subplots(
         figsize=(max(7, len(profiles) * 0.8), max(8, len(risks) * 0.4)),
     )
-    cmap = None
+    cmap = plt.get_cmap("viridis")
     if missing_color is not None:
-        cmap = plt.get_cmap("viridis").with_extremes(bad=missing_color)
-    image = ax.imshow(matrix, aspect="auto", vmin=vmin, vmax=vmax, cmap=cmap)
-    fig.colorbar(image, ax=ax, label=colorbar_label)
-    ax.set_xticks(range(len(profiles)), profiles)
-    ax.set_yticks(range(len(risks)), risk_labels)
+        cmap = cmap.with_extremes(bad=missing_color)
+    image = ax.imshow(matrix, aspect="equal", vmin=vmin, vmax=vmax, cmap=cmap)
+    colorbar = fig.colorbar(image, ax=ax)
+    colorbar.set_label(colorbar_label, fontsize=CHART_LABEL_FONT_SIZE)
+    colorbar.ax.tick_params(labelsize=CHART_LABEL_FONT_SIZE)
+    ax.set_xticks(range(len(profiles)), profiles, fontsize=CHART_LABEL_FONT_SIZE)
+    ax.set_yticks(range(len(risks)), risk_labels, fontsize=CHART_LABEL_FONT_SIZE)
     if show_grid:
         ax.set_xticks([index - 0.5 for index in range(len(profiles) + 1)], minor=True)
         ax.set_yticks([index - 0.5 for index in range(len(risks) + 1)], minor=True)
         ax.grid(which="minor", color="#d0d0d0", linewidth=0.6)
         ax.tick_params(which="minor", bottom=False, left=False)
-    ax.set_title(title)
+    ax.set_title(title, fontsize=CHART_TITLE_FONT_SIZE)
     fig.tight_layout()
     fig.savefig(summary_dir / filename, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -412,6 +429,12 @@ def _build_top_k_membership_matrix(
                 seen_risks.add(risk)
                 selected_risks.append(risk)
 
+    selected_risks = _sort_risks_by_summed_weights(
+        risks=selected_risks,
+        profile_mean_weights=profile_mean_weights,
+        profiles=profiles,
+    )
+
     matrix = [
         [
             float(profile_mean_weights[profile_id][risk])
@@ -422,6 +445,23 @@ def _build_top_k_membership_matrix(
         for risk in selected_risks
     ]
     return selected_risks, matrix
+
+
+def _sort_risks_by_summed_weights(
+    risks: Iterable[str],
+    profile_mean_weights: Mapping[str, Mapping[str, float]],
+    profiles: Sequence[str],
+) -> List[str]:
+    return sorted(
+        risks,
+        key=lambda risk: (
+            -sum(
+                float(profile_mean_weights.get(profile_id, {}).get(risk, 0.0))
+                for profile_id in profiles
+            ),
+            risk,
+        ),
+    )
 
 
 def _compact_risk_labels(risks: Sequence[str]) -> List[str]:
