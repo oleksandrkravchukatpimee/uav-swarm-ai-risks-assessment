@@ -1,0 +1,373 @@
+version: 1
+P1:
+  name: AI/ML-heavy
+  description: Focus on uncertainty, calibration, confabulations, and model-related risks.
+  stages: KA = TR > OP > KS
+  factors:
+    KS: H > T
+    KA: T > H
+    TR: T > H
+    OP: T > H
+  risks:
+    KS:
+      H:
+        representativeness: high
+        dataset_bias: high
+        temporal_bias: medium
+        scale_mismatch: medium
+        limited_scene_diversity: medium
+        missing_operational_scenarios: high
+        label_metadata_leakage: medium
+        data_contamination_train_test_leakage: medium
+        data_to_ops_mismatch: medium
+        operator_supervision_mismatch: medium
+      T:
+        sensor_heterogeneity: high
+        compression_artifacts_transformations: medium
+        georeferencing_sensor_calibration_errors: medium
+        latency_refresh_rate_mismatch: medium
+        correlated_inter_agent_errors_ks: medium
+        class_event_imbalance: medium
+        pipeline_mismatch: medium
+        weather_smoke_snow_degradation_gap: high
+        ood_unknown_unknowns: high
+        c2_mode_mismatch: medium
+    KA:
+      H:
+        annotation_errors: high
+        task_formulation_mismatch: high
+        incomplete_validation_criteria_ka: medium
+        assumption_mismatch_sensors_comms: medium
+        ood_domain_definition_error: medium
+        misdiagnosis_error_causes: medium
+        swarm_in_the_loop_omission: medium
+        hsi_operator_loop_omission: medium
+      T:
+        inadequate_model_architecture: high
+        lack_of_uncertainty_estimation: very_high
+        feature_leakage: high
+        incorrect_spatial_geometric_interpretation: very_high
+        frame_mismatch: high
+        representation_mismatch: high
+        correlated_errors_graph_omission: high
+        pseudo_quantification: very_high
+    TR:
+      H:
+        domain_shift: high
+        incomplete_validation_criteria: medium
+        data_leakage_split_overestimation: high
+        overfitting_regularization_control_gap: medium
+        reproducibility_failure: medium
+        continual_online_learning_misuse: medium
+      T:
+        overfitting: high
+        confabulations: very_high
+        confidence_miscalibration: very_high
+        catastrophic_forgetting: low
+        domain_shift_technological: high
+        metric_gaming: high
+        noise_blur_compression_fragility: high
+        correlated_error_structure: high
+        latency_compute_budget_breach: high
+        training_instability: high
+        preprocessing_augmentation_pipeline_defects: high
+        selective_prediction_failure: high
+    OP:
+      H:
+        loss_of_situational_awareness: high
+        policy_misconfiguration: medium
+        operator_override_error: medium
+        ops_gaps: medium
+        mission_drift: medium
+      T:
+        sensor_artifacts: high
+        concept_drift: high
+        cascading_error_propagation: medium
+        correlated_perception_errors: medium
+        communication_loss_fragmentation: medium
+        dynamic_topology: medium
+        compute_overload: medium
+        model_version_skew: medium
+        map_inconsistency: high
+        security_robustness: high
+        fallback_failure: medium
+        collective_robustness_loss: medium
+P2:
+  name: Swarm/Ops-heavy
+  description: Focus on operation-stage risks, coordination failures, and cascading effects in the swarm.
+  stages: OP >> TR > KA > KS
+  factors:
+    KS: H > T
+    KA: T > H
+    TR: T > H
+    OP: T >> H
+  risks:
+    KS:
+      H:
+        representativeness: high
+        dataset_bias: high
+        temporal_bias: low
+        scale_mismatch: low
+        limited_scene_diversity: low
+        missing_operational_scenarios: high
+        label_metadata_leakage: low
+        data_contamination_train_test_leakage: low
+        data_to_ops_mismatch: low
+        operator_supervision_mismatch: low
+      T:
+        sensor_heterogeneity: high
+        compression_artifacts_transformations: low
+        georeferencing_sensor_calibration_errors: low
+        latency_refresh_rate_mismatch: low
+        correlated_inter_agent_errors_ks: very_high
+        class_event_imbalance: low
+        pipeline_mismatch: low
+        weather_smoke_snow_degradation_gap: high
+        ood_unknown_unknowns: high
+        c2_mode_mismatch: low
+    KA:
+      H:
+        annotation_errors: high
+        task_formulation_mismatch: high
+        incomplete_validation_criteria_ka: medium
+        assumption_mismatch_sensors_comms: medium
+        ood_domain_definition_error: medium
+        misdiagnosis_error_causes: medium
+        swarm_in_the_loop_omission: medium
+        hsi_operator_loop_omission: medium
+      T:
+        inadequate_model_architecture: high
+        lack_of_uncertainty_estimation: medium
+        feature_leakage: high
+        incorrect_spatial_geometric_interpretation: medium
+        frame_mismatch: medium
+        representation_mismatch: medium
+        correlated_errors_graph_omission: very_high
+        pseudo_quantification: medium
+    TR:
+      H:
+        domain_shift: high
+        incomplete_validation_criteria: medium
+        data_leakage_split_overestimation: high
+        overfitting_regularization_control_gap: medium
+        reproducibility_failure: medium
+        continual_online_learning_misuse: medium
+      T:
+        overfitting: high
+        confabulations: medium
+        confidence_miscalibration: medium
+        catastrophic_forgetting: low
+        domain_shift_technological: high
+        metric_gaming: medium
+        noise_blur_compression_fragility: high
+        correlated_error_structure: very_high
+        latency_compute_budget_breach: medium
+        training_instability: medium
+        preprocessing_augmentation_pipeline_defects: medium
+        selective_prediction_failure: medium
+    OP:
+      H:
+        loss_of_situational_awareness: high
+        policy_misconfiguration: medium
+        operator_override_error: medium
+        ops_gaps: medium
+        mission_drift: medium
+      T:
+        sensor_artifacts: high
+        concept_drift: high
+        cascading_error_propagation: very_high
+        correlated_perception_errors: very_high
+        communication_loss_fragmentation: very_high
+        dynamic_topology: very_high
+        compute_overload: high
+        model_version_skew: high
+        map_inconsistency: high
+        security_robustness: high
+        fallback_failure: high
+        collective_robustness_loss: very_high
+P3:
+  name: Balanced
+  description: Balanced profile with moderate priorities across the lifecycle and risk groups.
+  stages: OP > TR = KA > KS
+  factors:
+    KS: H = T
+    KA: T = H
+    TR: T = H
+    OP: T > H
+  risks:
+    KS:
+      H:
+        representativeness: high
+        dataset_bias: high
+        temporal_bias: medium
+        scale_mismatch: medium
+        limited_scene_diversity: medium
+        missing_operational_scenarios: high
+        label_metadata_leakage: medium
+        data_contamination_train_test_leakage: medium
+        data_to_ops_mismatch: medium
+        operator_supervision_mismatch: medium
+      T:
+        sensor_heterogeneity: high
+        compression_artifacts_transformations: medium
+        georeferencing_sensor_calibration_errors: medium
+        latency_refresh_rate_mismatch: medium
+        correlated_inter_agent_errors_ks: medium
+        class_event_imbalance: medium
+        pipeline_mismatch: medium
+        weather_smoke_snow_degradation_gap: high
+        ood_unknown_unknowns: high
+        c2_mode_mismatch: medium
+    KA:
+      H:
+        annotation_errors: high
+        task_formulation_mismatch: high
+        incomplete_validation_criteria_ka: medium
+        assumption_mismatch_sensors_comms: medium
+        ood_domain_definition_error: medium
+        misdiagnosis_error_causes: medium
+        swarm_in_the_loop_omission: medium
+        hsi_operator_loop_omission: medium
+      T:
+        inadequate_model_architecture: high
+        lack_of_uncertainty_estimation: medium
+        feature_leakage: high
+        incorrect_spatial_geometric_interpretation: very_high
+        frame_mismatch: medium
+        representation_mismatch: medium
+        correlated_errors_graph_omission: medium
+        pseudo_quantification: medium
+    TR:
+      H:
+        domain_shift: high
+        incomplete_validation_criteria: medium
+        data_leakage_split_overestimation: high
+        overfitting_regularization_control_gap: medium
+        reproducibility_failure: medium
+        continual_online_learning_misuse: medium
+      T:
+        overfitting: high
+        confabulations: medium
+        confidence_miscalibration: medium
+        catastrophic_forgetting: low
+        domain_shift_technological: high
+        metric_gaming: medium
+        noise_blur_compression_fragility: high
+        correlated_error_structure: medium
+        latency_compute_budget_breach: medium
+        training_instability: medium
+        preprocessing_augmentation_pipeline_defects: medium
+        selective_prediction_failure: medium
+    OP:
+      H:
+        loss_of_situational_awareness: high
+        policy_misconfiguration: medium
+        operator_override_error: medium
+        ops_gaps: medium
+        mission_drift: medium
+      T:
+        sensor_artifacts: high
+        concept_drift: high
+        cascading_error_propagation: very_high
+        correlated_perception_errors: medium
+        communication_loss_fragmentation: medium
+        dynamic_topology: medium
+        compute_overload: medium
+        model_version_skew: medium
+        map_inconsistency: high
+        security_robustness: high
+        fallback_failure: medium
+        collective_robustness_loss: medium
+P4:
+  name: Safety/Validation-heavy
+  description: Focus on uncertainty handling, validation quality, safety constraints, and fallback behavior.
+  stages: OP = TR = KA > KS
+  factors:
+    KS: H = T
+    KA: T > H
+    TR: T > H
+    OP: T = H
+  risks:
+    KS:
+      H:
+        representativeness: high
+        dataset_bias: high
+        temporal_bias: medium
+        scale_mismatch: medium
+        limited_scene_diversity: medium
+        missing_operational_scenarios: high
+        label_metadata_leakage: medium
+        data_contamination_train_test_leakage: medium
+        data_to_ops_mismatch: medium
+        operator_supervision_mismatch: high
+      T:
+        sensor_heterogeneity: high
+        compression_artifacts_transformations: medium
+        georeferencing_sensor_calibration_errors: medium
+        latency_refresh_rate_mismatch: medium
+        correlated_inter_agent_errors_ks: medium
+        class_event_imbalance: medium
+        pipeline_mismatch: medium
+        weather_smoke_snow_degradation_gap: high
+        ood_unknown_unknowns: high
+        c2_mode_mismatch: medium
+    KA:
+      H:
+        annotation_errors: high
+        task_formulation_mismatch: high
+        incomplete_validation_criteria_ka: very_high
+        assumption_mismatch_sensors_comms: medium
+        ood_domain_definition_error: medium
+        misdiagnosis_error_causes: medium
+        swarm_in_the_loop_omission: high
+        hsi_operator_loop_omission: high
+      T:
+        inadequate_model_architecture: high
+        lack_of_uncertainty_estimation: very_high
+        feature_leakage: high
+        incorrect_spatial_geometric_interpretation: medium
+        frame_mismatch: medium
+        representation_mismatch: medium
+        correlated_errors_graph_omission: medium
+        pseudo_quantification: medium
+    TR:
+      H:
+        domain_shift: high
+        incomplete_validation_criteria: very_high
+        data_leakage_split_overestimation: high
+        overfitting_regularization_control_gap: medium
+        reproducibility_failure: medium
+        continual_online_learning_misuse: medium
+      T:
+        overfitting: high
+        confabulations: medium
+        confidence_miscalibration: very_high
+        catastrophic_forgetting: low
+        domain_shift_technological: high
+        metric_gaming: medium
+        noise_blur_compression_fragility: high
+        correlated_error_structure: medium
+        latency_compute_budget_breach: medium
+        training_instability: medium
+        preprocessing_augmentation_pipeline_defects: medium
+        selective_prediction_failure: very_high
+    OP:
+      H:
+        loss_of_situational_awareness: high
+        policy_misconfiguration: high
+        operator_override_error: medium
+        ops_gaps: medium
+        mission_drift: medium
+      T:
+        sensor_artifacts: high
+        concept_drift: high
+        cascading_error_propagation: medium
+        correlated_perception_errors: medium
+        communication_loss_fragmentation: medium
+        dynamic_topology: medium
+        compute_overload: medium
+        model_version_skew: medium
+        map_inconsistency: high
+        security_robustness: high
+        fallback_failure: very_high
+        collective_robustness_loss: very_high

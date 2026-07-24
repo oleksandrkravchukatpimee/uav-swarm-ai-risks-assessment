@@ -1,0 +1,92 @@
+version: 1
+aliases:
+  stages:
+    KS: Knowledge selection
+    KA: Knowledge analysis
+    TR: Model training
+    OP: Model operation
+  factors:
+    H: Human
+    T: Technological
+  risks:
+    representativeness: Data representativeness / representativeness gap
+    dataset_bias: Dataset bias / spatial bias
+    temporal_bias: Temporal bias / seasonality
+    scale_mismatch: Scale mismatch
+    limited_scene_diversity: Limited scene diversity
+    missing_operational_scenarios: Missing operational scenarios
+    label_metadata_leakage: Label/metadata leakage
+    data_contamination_train_test_leakage: Data contamination / train-test leakage
+    data_to_ops_mismatch: Data-to-ops mismatch
+    operator_supervision_mismatch: Operator/supervision mismatch
+    sensor_heterogeneity: Sensor heterogeneity
+    compression_artifacts_transformations: Compression artifacts and data transformations
+    georeferencing_sensor_calibration_errors: Georeferencing and sensor calibration errors
+    latency_refresh_rate_mismatch: Latency/refresh-rate mismatch
+    correlated_inter_agent_errors_ks: Correlated inter-agent errors not represented in data
+    class_event_imbalance: Class/event imbalance
+    pipeline_mismatch: Data format / pipeline mismatch
+    weather_smoke_snow_degradation_gap: Weather/smoke/snow degradation coverage gap
+    ood_unknown_unknowns: OOD / unknown unknowns
+    c2_mode_mismatch: C2-mode mismatch
+    annotation_errors: Annotation errors
+    task_formulation_mismatch: Task formulation mismatch
+    incomplete_validation_criteria_ka: Incomplete or inadequate validation criteria
+    assumption_mismatch_sensors_comms: Assumption mismatch about sensors and communication
+    ood_domain_definition_error: OOD / working-domain definition error
+    misdiagnosis_error_causes: Misdiagnosis of error causes
+    swarm_in_the_loop_omission: Swarm-in-the-loop omission
+    hsi_operator_loop_omission: HSI / operator-loop omission
+    inadequate_model_architecture: Inadequate model architecture
+    lack_of_uncertainty_estimation: Lack of formal uncertainty estimation
+    feature_leakage: Feature leakage / reliance on spurious features
+    incorrect_spatial_geometric_interpretation: Incorrect spatial-geometric interpretation
+    frame_mismatch: Spatial frame / map mismatch
+    representation_mismatch: Representation mismatch for swarm needs
+    correlated_errors_graph_omission: Correlated errors x interaction graph omission
+    pseudo_quantification: Pseudo-quantification risk
+    domain_shift: Domain shift underestimation
+    incomplete_validation_criteria: Incomplete validation criteria
+    data_leakage_split_overestimation: Overestimation due to data leakage / wrong splits
+    overfitting_regularization_control_gap: Insufficient overfitting / regularization control
+    reproducibility_failure: Reproducibility failure
+    continual_online_learning_misuse: Wrong continual/online learning approach
+    overfitting: Overfitting
+    confabulations: Confabulations
+    confidence_miscalibration: Confidence miscalibration
+    catastrophic_forgetting: Catastrophic forgetting
+    domain_shift_technological: Domain shift as technological robustness failure
+    metric_gaming: Metric gaming
+    noise_blur_compression_fragility: Noise/blur/compression fragility
+    correlated_error_structure: Correlated error structure omission
+    latency_compute_budget_breach: Latency/compute budget breach
+    training_instability: Training instability
+    preprocessing_augmentation_pipeline_defects: Preprocessing and augmentation pipeline defects
+    selective_prediction_failure: Selective prediction / refusal failure
+    loss_of_situational_awareness: Loss of situational awareness
+    policy_misconfiguration: Policy misconfiguration
+    operator_override_error: Incorrect operator override
+    ops_gaps: OPS gaps
+    mission_drift: Mission drift
+    sensor_artifacts: Sensor artifacts
+    concept_drift: Concept drift
+    cascading_error_propagation: Cascading error propagation
+    correlated_perception_errors: Correlated perception errors
+    communication_loss_fragmentation: Communication loss / swarm fragmentation
+    dynamic_topology: Dynamic topology
+    compute_overload: On-board compute overload
+    model_version_skew: Model version skew
+    map_inconsistency: Map inconsistency
+    security_robustness: Security robustness / spoofing
+    fallback_failure: Fallback failure / controlled degradation failure
+    collective_robustness_loss: Collective robustness loss
+scale:
+  relations:
+    '=': 0
+    '>': 2
+    '>>': 4
+  priorities:
+    low: 1
+    medium: 2
+    high: 3
+    very_high: 4
