@@ -225,7 +225,13 @@ def summarize_results(
     with (summary_dir / "cross_profile.json").open("w", encoding="utf-8") as f:
         json.dump(cross_profile_summary, f, ensure_ascii=False, indent=2)
 
-    _try_generate_charts(summary_dir, profile_summary, profile_mean_weights, acceptance_rows)
+    _try_generate_charts(
+        summary_dir,
+        profile_summary,
+        profile_mean_weights,
+        acceptance_rows,
+        profile_correlations,
+    )
     _write_markdown_report(summary_dir / "report.md", summary_payload)
     return summary_payload
 
@@ -235,6 +241,7 @@ def _try_generate_charts(
     profile_summary: Mapping[str, Any],
     profile_mean_weights: Mapping[str, Mapping[str, float]],
     acceptance_rows: Sequence[Mapping[str, Any]],
+    profile_correlations: Mapping[str, Mapping[str, float]],
 ) -> None:
     try:
         import matplotlib
@@ -345,6 +352,18 @@ def _try_generate_charts(
             show_grid=True,
         )
 
+    if all_profiles:
+        correlation_matrix = _build_spearman_correlation_matrix(
+            profiles=all_profiles,
+            profile_correlations=profile_correlations,
+        )
+        _save_profile_correlation_heatmap(
+            plt=plt,
+            summary_dir=summary_dir,
+            profiles=all_profiles,
+            matrix=correlation_matrix,
+        )
+
     # Top-5 frequency per profile (single chart per profile).
     # Horizontal bars keep long hierarchy paths readable.
     for profile_id, payload in profile_summary.items():
@@ -383,15 +402,26 @@ def _save_risk_profile_heatmap(
     missing_color: str | None = None,
     show_grid: bool = False,
 ) -> None:
-    risk_labels = _compact_risk_labels(risks)
+    risk_labels = list(risks)
+    cell_size_inches = 0.42
+    longest_label_chars = max((len(label) for label in risk_labels), default=0)
+    label_width_inches = max(4.5, longest_label_chars * 0.10)
+    figure_width = max(
+        10.0,
+        label_width_inches + len(profiles) * cell_size_inches + 3.0,
+    )
+    figure_height = max(
+        6.0,
+        len(risks) * cell_size_inches + 1.5,
+    )
     fig, ax = plt.subplots(
-        figsize=(max(7, len(profiles) * 0.8), max(8, len(risks) * 0.4)),
+        figsize=(figure_width, figure_height),
     )
     cmap = plt.get_cmap("viridis")
     if missing_color is not None:
         cmap = cmap.with_extremes(bad=missing_color)
     image = ax.imshow(matrix, aspect="equal", vmin=vmin, vmax=vmax, cmap=cmap)
-    colorbar = fig.colorbar(image, ax=ax)
+    colorbar = fig.colorbar(image, ax=ax, fraction=0.035, pad=0.035, aspect=30)
     colorbar.set_label(colorbar_label, fontsize=CHART_LABEL_FONT_SIZE)
     colorbar.ax.tick_params(labelsize=CHART_LABEL_FONT_SIZE)
     ax.set_xticks(range(len(profiles)), profiles, fontsize=CHART_LABEL_FONT_SIZE)
@@ -405,6 +435,80 @@ def _save_risk_profile_heatmap(
     fig.tight_layout()
     fig.savefig(summary_dir / filename, dpi=150, bbox_inches="tight")
     plt.close(fig)
+
+
+def _save_profile_correlation_heatmap(
+    plt: Any,
+    summary_dir: Path,
+    profiles: Sequence[str],
+    matrix: Sequence[Sequence[float]],
+) -> None:
+    figure_size = max(7.0, len(profiles) * 1.1 + 3.0)
+    fig, ax = plt.subplots(figsize=(figure_size, figure_size))
+    cmap = plt.get_cmap("viridis").with_extremes(bad="white")
+    image = ax.imshow(matrix, aspect="equal", vmin=-1.0, vmax=1.0, cmap=cmap)
+    colorbar = fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04, aspect=30)
+    colorbar.set_label("Spearman coefficient", fontsize=CHART_LABEL_FONT_SIZE)
+    colorbar.ax.tick_params(labelsize=CHART_LABEL_FONT_SIZE)
+
+    ax.set_xticks(range(len(profiles)), profiles, fontsize=CHART_LABEL_FONT_SIZE)
+    ax.set_yticks(range(len(profiles)), profiles, fontsize=CHART_LABEL_FONT_SIZE)
+    ax.set_xlabel("Profile", fontsize=CHART_LABEL_FONT_SIZE)
+    ax.set_ylabel("Profile", fontsize=CHART_LABEL_FONT_SIZE)
+    ax.set_xticks([index - 0.5 for index in range(len(profiles) + 1)], minor=True)
+    ax.set_yticks([index - 0.5 for index in range(len(profiles) + 1)], minor=True)
+    ax.grid(which="minor", color="#d0d0d0", linewidth=0.6)
+    ax.tick_params(which="minor", bottom=False, left=False)
+    ax.set_title("Ranking Correlation between Profiles", fontsize=CHART_TITLE_FONT_SIZE)
+
+    for row_index, row in enumerate(matrix):
+        for column_index, value in enumerate(row):
+            if value != value:
+                continue
+            normalized = max(0.0, min(1.0, (value + 1.0) / 2.0))
+            red, green, blue, _ = cmap(normalized)
+            luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+            ax.text(
+                column_index,
+                row_index,
+                f"{value:.4f}",
+                ha="center",
+                va="center",
+                color="black" if luminance > 0.55 else "white",
+                fontsize=CHART_LABEL_FONT_SIZE,
+            )
+
+    fig.tight_layout()
+    fig.savefig(
+        summary_dir / "ranking_correlation_heatmap.png",
+        dpi=150,
+        bbox_inches="tight",
+    )
+    plt.close(fig)
+
+
+def _build_spearman_correlation_matrix(
+    profiles: Sequence[str],
+    profile_correlations: Mapping[str, Mapping[str, float]],
+) -> List[List[float]]:
+    matrix: List[List[float]] = []
+    for row_profile in profiles:
+        row: List[float] = []
+        for column_profile in profiles:
+            if row_profile == column_profile:
+                row.append(1.0)
+                continue
+
+            correlation = profile_correlations.get(f"{row_profile}__{column_profile}")
+            if correlation is None:
+                correlation = profile_correlations.get(f"{column_profile}__{row_profile}")
+            row.append(
+                float(correlation["spearman_rho"])
+                if correlation and "spearman_rho" in correlation
+                else float("nan")
+            )
+        matrix.append(row)
+    return matrix
 
 
 def _build_top_k_membership_matrix(

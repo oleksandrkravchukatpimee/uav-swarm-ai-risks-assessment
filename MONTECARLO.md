@@ -134,6 +134,7 @@ results/montecarlo/
     top5_frequency_heatmap.png            # optional
     top10_frequency_heatmap.png           # optional
     top5_membership_heatmap.png           # optional
+    ranking_correlation_heatmap.png       # optional
     top5_frequency_P1.png                # optional
 ```
 

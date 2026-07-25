@@ -3,7 +3,11 @@ import unittest
 from math import isnan
 from pathlib import Path
 
-from montecarlo.analysis import _build_top_k_membership_matrix, summarize_results
+from montecarlo.analysis import (
+    _build_spearman_correlation_matrix,
+    _build_top_k_membership_matrix,
+    summarize_results,
+)
 from montecarlo.profiles import ProfileDefinition
 
 
@@ -50,6 +54,20 @@ class TestAnalysis(unittest.TestCase):
             self.assertGreater((summary_dir / "top5_frequency_heatmap.png").stat().st_size, 0)
             self.assertGreater((summary_dir / "top10_frequency_heatmap.png").stat().st_size, 0)
             self.assertGreater((summary_dir / "top5_membership_heatmap.png").stat().st_size, 0)
+            self.assertGreater((summary_dir / "ranking_correlation_heatmap.png").stat().st_size, 0)
+
+    def test_spearman_correlation_matrix_is_symmetric(self):
+        matrix = _build_spearman_correlation_matrix(
+            profiles=["P1", "P2"],
+            profile_correlations={
+                "P1__P2": {
+                    "spearman_rho": 0.625,
+                    "kendall_tau": 0.5,
+                },
+            },
+        )
+
+        self.assertEqual(matrix, [[1.0, 0.625], [0.625, 1.0]])
 
     def test_top_k_membership_matrix_masks_non_members(self):
         risks, matrix = _build_top_k_membership_matrix(
